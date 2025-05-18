@@ -1,0 +1,258 @@
+<h1>Administration</h1>
+
+<div class="admin-overview">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number"><%= @users_count %></div>
+      <div class="stat-label">Utilisateurs</div>
+      <%= link_to "Gérer", admin_users_path, class: "stat-link" %>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-number"><%= @schools_count %></div>
+      <div class="stat-label">Écoles</div>
+      <%= link_to "Gérer", admin_schools_path, class: "stat-link" %>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-number"><%= @councils_count %></div>
+      <div class="stat-label">Conseils</div>
+      <%= link_to "Gérer", admin_councils_path, class: "stat-link" %>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-number"><%= @reports_count %></div>
+      <div class="stat-label">Rapports</div>
+      <%= link_to "Gérer", admin_reports_path, class: "stat-link" %>
+    </div>
+  </div>
+</div>
+
+<div class="admin-sections">
+  <section class="section-users">
+    <div class="section-header">
+      <h2>Utilisateurs récents</h2>
+      <%= link_to "Voir tous", admin_users_path, class: "action-button" %>
+    </div>
+    
+    <% if @recent_users.any? %>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Identifiant</th>
+              <th>Email</th>
+              <th>Rôle</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_users.each do |user| %>
+              <tr>
+                <td><%= user.full_name %></td>
+                <td><%= user.username %></td>
+                <td><%= user.email %></td>
+                <td><span class="role-badge <%= user.role %>"><%= user.role %></span></td>
+                <td>
+                  <%= link_to "Modifier", edit_admin_user_path(user), class: "table-action" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="info-message">Aucun utilisateur enregistré.</p>
+    <% end %>
+  </section>
+  
+  <section class="section-councils">
+    <div class="section-header">
+      <h2>Conseils récents</h2>
+      <%= link_to "Voir tous", admin_councils_path, class: "action-button" %>
+    </div>
+    
+    <% if @recent_councils.any? %>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Titre</th>
+              <th>École</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @recent_councils.each do |council| %>
+              <tr>
+                <td><%= council.date.strftime('%d/%m/%Y') %></td>
+                <td><%= council.title %></td>
+                <td><%= council.school.name %></td>
+                <td>
+                  <%= link_to "Voir", admin_council_path(council), class: "table-action" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="info-message">Aucun conseil planifié.</p>
+    <% end %>
+  </section>
+</div>
+
+<style>
+  .admin-overview {
+    margin-bottom: 30px;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .stat-card {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+  }
+  
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #c00;
+  }
+  
+  .stat-label {
+    margin-top: 10px;
+    color: #555;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+  }
+  
+  .stat-link {
+    display: inline-block;
+    margin-top: 10px;
+    background-color: #333;
+    color: white;
+    padding: 5px 15px;
+    border-radius: this4px;
+    text-decoration: none;
+    font-size: 0.8rem;
+  }
+  
+  .stat-link:hover {
+    background-color: #222;
+  }
+  
+  .admin-sections {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .action-button {
+    display: inline-block;
+    background-color: #c00;
+    color: white;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+  
+  .action-button:hover {
+    background-color: #a00;
+  }
+  
+  .data-table-container {
+    overflow-x: auto;
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 4px;
+  }
+  
+  .data-table thead {
+    background-color: #f5f5f5;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .data-table tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .role-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .role-badge.admin {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .role-badge.official {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .role-badge.school {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .table-action {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background-color: #eee;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.8rem;
+  }
+  
+  .table-action:hover {
+    background-color: #ddd;
+  }
+  
+  .info-message {
+    background-color: #e9f5fb;
+    padding: 15px;
+    border-radius: 8px;
+    color: #0c5460;
+  }
+  
+  @media (min-width: 992px) {
+    .admin-sections {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

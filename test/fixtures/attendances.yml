@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  council: one
+  official: one
+  status: MyString
+  updated_at: 2025-05-18 16:27:14
+
+two:
+  council: two
+  official: two
+  status: MyString
+  updated_at: 2025-05-18 16:27:14

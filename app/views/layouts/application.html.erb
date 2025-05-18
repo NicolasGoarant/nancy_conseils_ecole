@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Nancy - Conseils d'École</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background-color: #c00;
+        color: white;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      main {
+        padding: 2rem;
+      }
+      footer {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 1rem;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+      }
+      nav ul {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      nav ul li {
+        margin-left: 1rem;
+      }
+      nav ul li a {
+        color: white;
+        text-decoration: none;
+      }
+      .logo a {
+        color: white;
+        text-decoration: none;
+      }
+      .notice, .alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 4px;
+      }
+      .notice {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .alert {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      .school-card {
+        background-color: #f9f9f9;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .field {
+        margin-bottom: 1rem;
+      }
+      .actions {
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">
+        <%= link_to root_path do %>
+          <h1>Nancy - Conseils d'École</h1>
+        <% end %>
+      </div>
+      
+      <% if logged_in? %>
+        <nav>
+          <ul>
+            <li><%= link_to "Tableau de bord", root_path %></li>
+            <% if current_user.official? %>
+              <li><%= link_to "Mes écoles", schools_path %></li>
+              <li><%= link_to "Mes conseils", councils_path %></li>
+              <li><%= link_to "Mes rapports", reports_path %></li>
+            <% end %>
+            <% if current_user.school? %>
+              <li><%= link_to "Informations", information_index_path %></li>
+              <li><%= link_to "Conseils", councils_path %></li>
+            <% end %>
+            <% if current_user.admin? %>
+              <li><%= link_to "Administration", admin_root_path %></li>
+            <% end %>
+            <li><%= link_to "Déconnexion", logout_path, data: { turbo_method: :delete } %></li>
+          </ul>
+        </nav>
+      <% end %>
+    </header>
+    
+    <main>
+      <% if flash[:notice] %>
+        <div class="notice"><%= flash[:notice] %></div>
+      <% end %>
+      
+      <% if flash[:alert] %>
+        <div class="alert"><%= flash[:alert] %></div>
+      <% end %>
+      
+      <%= yield %>
+    </main>
+    
+    <footer>
+      <p>&copy; <%= Date.today.year %> Ville de Nancy - Direction de l'Éducation</p>
+    </footer>
+  </body>
+</html>

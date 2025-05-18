@@ -1,0 +1,29 @@
+<div class="admin-header">
+  <h1>Nouvel utilisateur</h1>
+  <%= link_to "Retour aux utilisateurs", admin_users_path, class: "back-button" %>
+</div>
+
+<%= render 'form' %>
+
+<style>
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .back-button {
+    display: inline-block;
+    background-color: #f5f5f5;
+    color: #333;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  
+  .back-button:hover {
+    background-color: #e5e5e5;
+  }
+</style>
