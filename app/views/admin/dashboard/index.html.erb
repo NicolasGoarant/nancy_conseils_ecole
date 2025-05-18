@@ -1,50 +1,66 @@
-<%# En-tête avec bannière et navigation %>
 <div class="header-banner">
-  <div class="container">
-    <div class="header-content">
-      <div class="city-logo-title">
-        <h1>Conseils d'École - Ville de Nancy</h1>
-        <p class="subtitle">Direction de l'Éducation</p>
-      </div>
-    </div>
-  </div>
+  <h1>Tableau de bord - Conseils d'École</h1>
+  <p class="subtitle">Ville de Nancy - Direction de l'Éducation</p>
 </div>
 
-<div class="container main-content">
-  <% if current_user %>
-    <%# Message de bienvenue personnalisé %>
-    <div class="welcome-card">
-      <div class="welcome-icon">
+<% if current_user %>
+  <div class="welcome-card">
+    <div class="welcome-icon">
+      <% if current_user.admin? %>
+        <i class="fas fa-user-shield"></i>
+      <% elsif current_user.official? %>
+        <i class="fas fa-user-tie"></i>
+      <% elsif current_user.school? %>
+        <i class="fas fa-school"></i>
+      <% end %>
+    </div>
+    <div class="welcome-text">
+      <h2>Bienvenue, <%= current_user.full_name %></h2>
+      <p>
         <% if current_user.admin? %>
-          <i class="fas fa-user-shield"></i>
+          Vous avez accès à la gestion de toutes les écoles et des conseils d'école.
         <% elsif current_user.official? %>
-          <i class="fas fa-user-tie"></i>
+          Vous pouvez consulter les informations des écoles qui vous sont assignées.
         <% elsif current_user.school? %>
-          <i class="fas fa-school"></i>
+          Vous pouvez gérer les informations de votre établissement et planifier les conseils d'école.
         <% end %>
+      </p>
+    </div>
+  </div>
+
+  <% if current_user.admin? %>
+    <div class="stats-overview">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-school"></i></div>
+        <div class="stat-value"><%= @schools_count %></div>
+        <div class="stat-label">Écoles</div>
       </div>
-      <div class="welcome-text">
-        <h2>Bienvenue, <%= current_user.full_name %></h2>
-        <p>
-          <% if current_user.admin? %>
-            Vous avez accès à la gestion de toutes les écoles et des conseils d'école.
-          <% elsif current_user.official? %>
-            Vous pouvez consulter les informations des écoles qui vous sont assignées.
-          <% elsif current_user.school? %>
-            Vous pouvez gérer les informations de votre établissement et planifier les conseils d'école.
-          <% end %>
-        </p>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-value"><%= @users_count %></div>
+        <div class="stat-label">Utilisateurs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+        <div class="stat-value"><%= @councils_count %></div>
+        <div class="stat-label">Conseils</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+        <div class="stat-value"><%= @reports_count %></div>
+        <div class="stat-label">Rapports</div>
       </div>
     </div>
+  <% end %>
 
-    <%# Filtres et recherche %>
-    <div class="filters-container">
-      <div class="search-bar">
-        <input type="text" id="school-search" placeholder="Rechercher une école..." class="search-input">
-        <button class="search-button"><i class="fas fa-search"></i></button>
-      </div>
-      <div class="filter-options">
-        <span class="filter-label">Filtrer par type :</span>
+  <div class="dashboard-section">
+    <div class="section-header">
+      <h2>Les écoles de Nancy</h2>
+      <div class="filters-container">
+        <div class="search-bar">
+          <input type="text" id="school-search" placeholder="Rechercher une école..." class="search-input">
+          <button class="search-button"><i class="fas fa-search"></i></button>
+        </div>
         <div class="filter-buttons">
           <button class="filter-btn active" data-filter="all">Toutes</button>
           <button class="filter-btn" data-filter="elementary">Élémentaire</button>
@@ -52,37 +68,28 @@
           <button class="filter-btn" data-filter="primary">Primaire</button>
         </div>
       </div>
-      <div class="sort-options">
-        <select id="sort-select" class="sort-select">
-          <option value="name-asc">Nom (A-Z)</option>
-          <option value="name-desc">Nom (Z-A)</option>
-        </select>
-      </div>
     </div>
 
-    <%# Grille des écoles %>
-    <h2 class="section-title">Les écoles de Nancy</h2>
-    
     <div class="schools-grid" id="schools-container">
       <% 
-        # Détermine les écoles à afficher selon le rôle
+        # Détermine les écoles à afficher : toutes pour les admins, seulement les associations pour les autres
         schools_to_display = if current_user.admin?
-                              School.all
+                              @all_schools
                              elsif current_user.official?
-                              current_user.schools.where(associations: { active: true })
+                              current_user.schools.where(associations: { active: true }).distinct
                              elsif current_user.school?
-                              current_user.schools
+                              current_user.schools.distinct
                              else
                               []
                              end
       %>
       
       <% schools_to_display.each do |school| %>
-        <div class="school-card" data-type="<%= school.type.downcase %>">
+        <div class="school-card" data-type="<%= school.type&.downcase %>">
           <div class="school-header">
             <h3 class="school-name"><%= school.name %></h3>
-            <span class="school-type <%= school.type.downcase %>">
-              <%= { 'elementary' => 'Élémentaire', 'nursery' => 'Maternelle', 'primary' => 'Primaire' }[school.type] %>
+            <span class="school-type <%= school.type&.downcase %>">
+              <%= { 'elementary' => 'Élémentaire', 'nursery' => 'Maternelle', 'primary' => 'Primaire' }[school.type] || 'École' %>
             </span>
           </div>
           <div class="school-icon">
@@ -98,15 +105,15 @@
             <p class="school-address"><i class="fas fa-map-marker-alt"></i> <%= school.address %></p>
             <div class="school-stats">
               <div class="stat-item">
-                <span class="stat-value"><%= school.class_count %></span>
+                <span class="stat-value"><%= school.class_count || 0 %></span>
                 <span class="stat-label">Classes</span>
               </div>
               <div class="stat-item">
-                <span class="stat-value"><%= school.student_count %></span>
+                <span class="stat-value"><%= school.student_count || 0 %></span>
                 <span class="stat-label">Élèves</span>
               </div>
               <div class="stat-item">
-                <span class="stat-value"><%= school.teacher_count %></span>
+                <span class="stat-value"><%= school.teacher_count || 0 %></span>
                 <span class="stat-label">Enseignants</span>
               </div>
             </div>
@@ -121,131 +128,86 @@
         </div>
       <% end %>
     </div>
+  </div>
 
-    <%# Prochains conseils %>
-    <div class="upcoming-councils-section">
-      <div class="section-header">
-        <h2 class="section-title">Prochains conseils</h2>
-        <%= link_to "Voir tous", councils_path, class: "view-all-link" %>
-      </div>
-      
-      <div class="councils-container">
-        <% 
-          upcoming_councils = if current_user.admin?
-                              Council.where('date >= ?', Date.today).order(date: :asc).limit(5)
-                             elsif current_user.official?
-                              Council.joins(school: :associations)
-                                .where(associations: { user_id: current_user.id, active: true })
-                                .where('date >= ?', Date.today)
-                                .order(date: :asc)
-                                .limit(5)
-                             elsif current_user.school?
-                              Council.joins(school: :associations)
-                                .where(associations: { user_id: current_user.id })
-                                .where('date >= ?', Date.today)
-                                .order(date: :asc)
-                                .limit(5)
-                             else
-                              []
-                             end
-        %>
-        
-        <% if upcoming_councils.any? %>
-          <div class="council-cards">
-            <% upcoming_councils.each do |council| %>
-              <div class="council-card">
-                <div class="council-date">
-                  <div class="date-day"><%= council.date.strftime('%d') %></div>
-                  <div class="date-month"><%= council.date.strftime('%b') %></div>
-                </div>
-                <div class="council-details">
-                  <h3 class="council-title"><%= council.title %></h3>
-                  <p class="council-school"><%= council.school.name %></p>
-                  <p class="council-time">
-                    <i class="far fa-clock"></i> <%= council.start_time %> 
-                    <% if council.end_time.present? %>
-                      - <%= council.end_time %>
-                    <% end %>
-                  </p>
-                  <p class="council-location">
-                    <i class="fas fa-map-marker-alt"></i> <%= council.location || "À déterminer" %>
-                  </p>
-                </div>
-                <div class="council-actions">
-                  <%= link_to "Détails", council_path(council), class: "council-button" %>
-                  
-                  <% if current_user.official? %>
-                    <% attendance = council.attendances.find_by(user_id: current_user.id) %>
-                    <% if attendance %>
-                      <% if attendance.status == "pending" %>
-                        <div class="attendance-actions">
-                          <%= link_to "Confirmer", attendance_path(attendance, status: "confirmed"), method: :patch, class: "confirm-btn" %>
-                          <%= link_to "Décliner", attendance_path(attendance, status: "declined"), method: :patch, class: "decline-btn" %>
-                        </div>
-                      <% else %>
-                        <span class="attendance-status <%= attendance.status %>">
-                          <%= { "confirmed" => "Confirmé", "declined" => "Décliné" }[attendance.status] %>
-                        </span>
-                      <% end %>
+  <div class="dashboard-section">
+    <div class="section-header">
+      <h2>Prochains conseils</h2>
+      <%= link_to "Voir tous", councils_path, class: "view-all-link" %>
+    </div>
+    
+    <div class="councils-container">
+      <% if @upcoming_councils.any? %>
+        <div class="council-cards">
+          <% @upcoming_councils.each do |council| %>
+            <div class="council-card">
+              <div class="council-date">
+                <div class="date-day"><%= council.date.strftime('%d') %></div>
+                <div class="date-month"><%= council.date.strftime('%b') %></div>
+              </div>
+              <div class="council-details">
+                <h3 class="council-title"><%= council.title %></h3>
+                <p class="council-school"><%= council.school.name %></p>
+                <p class="council-time">
+                  <i class="far fa-clock"></i> <%= council.start_time %> 
+                  <% if council.end_time.present? %>
+                    - <%= council.end_time %>
+                  <% end %>
+                </p>
+                <p class="council-location">
+                  <i class="fas fa-map-marker-alt"></i> <%= council.location || "À déterminer" %>
+                </p>
+              </div>
+              <div class="council-actions">
+                <%= link_to "Détails", council_path(council), class: "council-button" %>
+                
+                <% if current_user.official? %>
+                  <% attendance = council.attendances.find_by(user_id: current_user.id) %>
+                  <% if attendance %>
+                    <% if attendance.status == "pending" %>
+                      <div class="attendance-actions">
+                        <%= link_to "Confirmer", attendance_path(attendance, status: "confirmed"), method: :patch, class: "confirm-btn" %>
+                        <%= link_to "Décliner", attendance_path(attendance, status: "declined"), method: :patch, class: "decline-btn" %>
+                      </div>
+                    <% else %>
+                      <span class="attendance-status <%= attendance.status %>">
+                        <%= { "confirmed" => "Confirmé", "declined" => "Décliné" }[attendance.status] %>
+                      </span>
                     <% end %>
                   <% end %>
-                </div>
+                <% end %>
               </div>
-            <% end %>
-          </div>
-        <% else %>
-          <p class="no-data-message">Aucun conseil à venir pour le moment.</p>
-        <% end %>
-      </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="no-data-message">Aucun conseil à venir pour le moment.</p>
+      <% end %>
     </div>
-  <% else %>
-    <%# Page de connexion requise %>
-    <div class="login-required">
-      <div class="login-message">
-        <i class="fas fa-lock"></i>
-        <h2>Accès restreint</h2>
-        <p>Veuillez vous connecter pour accéder au tableau de bord des conseils d'école.</p>
-        <%= link_to "Se connecter", login_path, class: "login-button" %>
-      </div>
+  </div>
+<% else %>
+  <div class="login-required">
+    <div class="login-message">
+      <i class="fas fa-lock"></i>
+      <h2>Accès restreint</h2>
+      <p>Veuillez vous connecter pour accéder au tableau de bord des conseils d'école.</p>
+      <%= link_to "Se connecter", login_path, class: "login-button" %>
     </div>
-  <% end %>
-</div>
+  </div>
+<% end %>
 
-<% content_for :scripts do %>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Filtrage des écoles
     const filterButtons = document.querySelectorAll('.filter-btn');
     const searchInput = document.getElementById('school-search');
-    const sortSelect = document.getElementById('sort-select');
     const schoolCards = document.querySelectorAll('.school-card');
     
-    // Fonction pour filtrer et trier les écoles
+    // Fonction pour filtrer les écoles
     function updateSchoolsDisplay() {
       const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
       const searchTerm = searchInput.value.toLowerCase();
-      const sortValue = sortSelect.value;
       
-      // Convertir la NodeList en array pour le tri
-      const schoolsArray = Array.from(schoolCards);
-      
-      // Trier les écoles
-      schoolsArray.sort((a, b) => {
-        const nameA = a.querySelector('.school-name').textContent.toLowerCase();
-        const nameB = b.querySelector('.school-name').textContent.toLowerCase();
-        
-        if (sortValue === 'name-asc') {
-          return nameA.localeCompare(nameB);
-        } else {
-          return nameB.localeCompare(nameA);
-        }
-      });
-      
-      // Réorganiser les écoles dans le DOM selon le tri
-      const container = document.getElementById('schools-container');
-      schoolsArray.forEach(card => container.appendChild(card));
-      
-      // Appliquer les filtres
       schoolCards.forEach(card => {
         const schoolName = card.querySelector('.school-name').textContent.toLowerCase();
         const schoolType = card.dataset.type;
@@ -254,7 +216,7 @@
         const matchesSearch = schoolName.includes(searchTerm);
         
         if (matchesFilter && matchesSearch) {
-          card.style.display = 'flex';
+          card.style.display = 'block';
         } else {
           card.style.display = 'none';
         }
@@ -271,77 +233,60 @@
     });
     
     searchInput.addEventListener('input', updateSchoolsDisplay);
-    sortSelect.addEventListener('change', updateSchoolsDisplay);
     
     // Initialisation
     updateSchoolsDisplay();
   });
 </script>
-<% end %>
 
 <style>
   /* Styles généraux */
   body {
-    font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, 
-      Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    font-family: 'Public Sans', Arial, sans-serif;
+    line-height: 1.6;
     color: #333;
-    line-height: 1.5;
     background-color: #f8f9fa;
-    margin: 0;
-    padding: 0;
   }
   
-  .container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-  }
-  
-  /* En-tête et bannière */
+  /* En-tête avec bannière */
   .header-banner {
     background: linear-gradient(to right, #003366, #1a5ca5);
     color: white;
-    padding: 2rem 0;
+    padding: 1.5rem 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: center;
   }
   
-  .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .city-logo-title h1 {
-    font-size: 2rem;
+  .header-banner h1 {
     margin: 0;
+    font-size: 2rem;
     font-weight: 700;
-    letter-spacing: -0.5px;
   }
   
   .subtitle {
+    margin-top: 0.5rem;
     font-size: 1.1rem;
     opacity: 0.8;
-    margin-top: 0.5rem;
   }
   
   /* Carte de bienvenue */
   .welcome-card {
-    background-color: white;
-    border-radius: 12px;
-    padding: 1.5rem;
     display: flex;
     align-items: center;
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     margin-bottom: 2rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     border-left: 5px solid #1a5ca5;
   }
   
   .welcome-icon {
-    font-size: 2.5rem;
-    width: 70px;
-    height: 70px;
+    font-size: 2rem;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -361,100 +306,70 @@
     color: #666;
   }
   
-  /* Filtres */
-  .filters-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
+  /* Statistiques */
+  .stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
     margin-bottom: 2rem;
-    align-items: center;
+  }
+  
+  .stat-card {
     background-color: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    text-align: center;
+    transition: transform 0.2s;
   }
   
-  .search-bar {
-    flex: 1;
-    min-width: 250px;
-    display: flex;
-    position: relative;
+  .stat-card:hover {
+    transform: translateY(-5px);
   }
   
-  .search-input {
-    width: 100%;
-    padding: 10px 40px 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 1rem;
-  }
-  
-  .search-button {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
+  .stat-icon {
+    margin-bottom: 1rem;
+    font-size: 2rem;
     color: #1a5ca5;
-    cursor: pointer;
   }
   
-  .filter-options {
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a5ca5;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  /* Section de tableau de bord */
+  .dashboard-section {
+    margin-bottom: 3rem;
+  }
+  
+  .section-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  
-  .filter-label {
-    font-weight: 500;
-    color: #555;
-  }
-  
-  .filter-buttons {
-    display: flex;
-    gap: 0.5rem;
-  }
-  
-  .filter-btn {
-    padding: 0.5rem 1rem;
-    background-color: #f0f2f5;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    color: #555;
-    transition: all 0.2s;
-  }
-  
-  .filter-btn.active {
-    background-color: #1a5ca5;
-    color: white;
-  }
-  
-  .sort-options {
-    min-width: 150px;
-  }
-  
-  .sort-select {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: white;
-  }
-  
-  /* Titres de section */
-  .section-title {
-    font-size: 1.5rem;
     margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .section-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
     position: relative;
     padding-bottom: 0.5rem;
-    font-weight: 600;
   }
   
-  .section-title::after {
+  .section-header h2::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -464,50 +379,110 @@
     background-color: #1a5ca5;
   }
   
+  /* Filtres et recherche */
+  .filters-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+  }
+  
+  .search-bar {
+    position: relative;
+    min-width: 250px;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.6rem 2.5rem 0.6rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 0.9rem;
+  }
+  
+  .search-button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #1a5ca5;
+    cursor: pointer;
+  }
+  
+  .filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .filter-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 20px;
+    background-color: #eee;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  
+  .filter-btn.active {
+    background-color: #1a5ca5;
+    color: white;
+  }
+  
+  .view-all-link {
+    color: #1a5ca5;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .view-all-link:after {
+    content: ' →';
+  }
+  
   /* Grille des écoles */
   .schools-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
-    margin-bottom: 3rem;
   }
   
   .school-card {
     background-color: white;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
     transition: transform 0.2s, box-shadow 0.2s;
-    display: flex;
-    flex-direction: column;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
   }
   
   .school-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
   }
   
   .school-header {
-    padding: 1.2rem 1.2rem 0;
+    padding: 1rem 1.25rem;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    border-bottom: 1px solid #f0f0f0;
   }
   
   .school-name {
     margin: 0;
     font-size: 1.2rem;
-    font-weight: 600;
     color: #1a5ca5;
-    line-height: 1.3;
   }
   
   .school-type {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 20px;
     font-weight: 500;
-    padding: 0.3rem 0.6rem;
-    border-radius: 12px;
-    white-space: nowrap;
+    text-transform: uppercase;
   }
   
   .school-type.elementary {
@@ -526,26 +501,21 @@
   }
   
   .school-icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem 0;
+    text-align: center;
+    padding: 1.5rem 0;
     font-size: 2.5rem;
     color: #1a5ca5;
-    opacity: 0.8;
+    opacity: 0.7;
   }
   
   .school-info {
-    padding: 0 1.2rem 1rem;
-    flex-grow: 1;
+    padding: 0 1.25rem 1.25rem;
   }
   
   .school-address {
     margin: 0 0 1rem;
     color: #666;
     font-size: 0.9rem;
-    display: flex;
-    align-items: center;
   }
   
   .school-address i {
@@ -555,9 +525,11 @@
   
   .school-stats {
     display: flex;
-    justify-content: space-between;
-    margin-top: 0.5rem;
+    justify-content: space-around;
     text-align: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
   }
   
   .stat-item {
@@ -565,36 +537,32 @@
     flex-direction: column;
   }
   
-  .stat-value {
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #1a5ca5;
+  .stat-item .stat-value {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
   }
   
-  .stat-label {
-    font-size: 0.8rem;
-    color: #666;
+  .stat-item .stat-label {
+    font-size: 0.75rem;
   }
   
   .school-actions {
-    padding: 1.2rem;
-    border-top: 1px solid #eee;
     display: flex;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid #f0f0f0;
     justify-content: space-between;
-    gap: 0.8rem;
+    gap: 0.5rem;
   }
   
   .action-button {
     flex: 1;
-    display: inline-block;
     text-align: center;
-    padding: 0.6rem 1rem;
+    padding: 0.6rem 0;
     background-color: #1a5ca5;
     color: white;
-    border-radius: 4px;
     text-decoration: none;
+    border-radius: 4px;
     font-weight: 500;
-    font-size: 0.9rem;
     transition: background-color 0.2s;
   }
   
@@ -603,43 +571,20 @@
   }
   
   .action-button.secondary {
-    background-color: #f0f2f5;
+    background-color: #eee;
     color: #555;
   }
   
   .action-button.secondary:hover {
-    background-color: #e1e5ea;
+    background-color: #ddd;
   }
   
   /* Conseils à venir */
-  .upcoming-councils-section {
-    margin-bottom: 3rem;
-  }
-  
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-  }
-  
-  .view-all-link {
-    color: #1a5ca5;
-    text-decoration: none;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-  }
-  
-  .view-all-link:hover {
-    text-decoration: underline;
-  }
-  
   .councils-container {
     background-color: white;
     border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
     overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
   }
   
   .council-cards {
@@ -649,8 +594,8 @@
   
   .council-card {
     display: flex;
-    padding: 1.2rem;
-    border-bottom: 1px solid #eee;
+    padding: 1.25rem;
+    border-bottom: 1px solid #f0f0f0;
   }
   
   .council-card:last-child {
@@ -660,55 +605,51 @@
   .council-date {
     min-width: 70px;
     height: 70px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     background-color: #1a5ca5;
     color: white;
-    border-radius: 8px;
-    margin-right: 1.2rem;
-    text-align: center;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-right: 1.25rem;
   }
   
   .date-day {
-    font-size: 1.6rem;
+    font-size: 1.75rem;
     font-weight: 700;
     line-height: 1;
   }
   
   .date-month {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     text-transform: uppercase;
-    margin-top: 0.3rem;
+    margin-top: 0.25rem;
   }
   
   .council-details {
-    flex-grow: 1;
+    flex: 1;
   }
   
   .council-title {
     margin: 0 0 0.5rem;
-    font-size: 1.1rem;
     color: #1a5ca5;
+    font-size: 1.1rem;
   }
   
   .council-school {
+    margin: 0 0 0.75rem;
     font-weight: 500;
-    margin: 0 0 0.5rem;
   }
   
   .council-time, .council-location {
+    margin: 0 0 0.35rem;
     color: #666;
-    margin: 0.2rem 0;
     font-size: 0.9rem;
-    display: flex;
-    align-items: center;
   }
   
   .council-time i, .council-location i {
     margin-right: 0.5rem;
-    color: #888;
     width: 16px;
     text-align: center;
   }
@@ -723,49 +664,41 @@
   }
   
   .council-button {
-    display: inline-block;
     padding: 0.5rem 1rem;
     background-color: #1a5ca5;
     color: white;
-    border-radius: 4px;
     text-decoration: none;
+    border-radius: 4px;
     font-weight: 500;
     font-size: 0.9rem;
-    transition: background-color 0.2s;
     text-align: center;
-  }
-  
-  .council-button:hover {
-    background-color: #0c4d8e;
   }
   
   .attendance-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.35rem;
   }
   
   .confirm-btn, .decline-btn {
-    padding: 0.4rem 0.8rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 4px;
     font-size: 0.8rem;
     text-decoration: none;
-    font-weight: 500;
+    color: white;
   }
   
   .confirm-btn {
     background-color: #4caf50;
-    color: white;
   }
   
   .decline-btn {
     background-color: #f44336;
-    color: white;
   }
   
   .attendance-status {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.6rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 4px;
+    font-size: 0.8rem;
     font-weight: 500;
   }
   
@@ -795,10 +728,10 @@
   
   .login-message {
     text-align: center;
-    padding: 2rem;
+    padding: 2.5rem;
     background-color: white;
     border-radius: 10px;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     max-width: 500px;
   }
   
@@ -810,7 +743,6 @@
   
   .login-message h2 {
     margin: 0 0 1rem;
-    color: #333;
   }
   
   .login-message p {
@@ -820,36 +752,16 @@
   
   .login-button {
     display: inline-block;
-    padding: 0.8rem 1.5rem;
+    padding: 0.75rem 1.5rem;
     background-color: #1a5ca5;
     color: white;
-    border-radius: 4px;
     text-decoration: none;
+    border-radius: 4px;
     font-weight: 500;
-    font-size: 1rem;
-    transition: background-color 0.2s;
-  }
-  
-  .login-button:hover {
-    background-color: #0c4d8e;
   }
   
   /* Responsive */
   @media (max-width: 768px) {
-    .header-content {
-      flex-direction: column;
-      text-align: center;
-    }
-    
-    .city-logo-title {
-      margin-bottom: 1rem;
-    }
-    
-    .filter-options {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    
     .welcome-card {
       flex-direction: column;
       text-align: center;
@@ -860,6 +772,20 @@
       margin-bottom: 1rem;
     }
     
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .filters-container {
+      margin-top: 1rem;
+      width: 100%;
+    }
+    
+    .search-bar {
+      width: 100%;
+    }
+    
     .council-card {
       flex-direction: column;
     }
@@ -867,7 +793,7 @@
     .council-date {
       margin-right: 0;
       margin-bottom: 1rem;
-      width: 70px;
+      align-self: center;
     }
     
     .council-actions {

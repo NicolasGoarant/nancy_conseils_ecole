@@ -1,74 +1,1161 @@
-<div class="login-container">
-  <h1>Connexion à l'application</h1>
-
-  <% if flash[:alert] %>
-    <div class="alert"><%= flash[:alert] %></div>
-  <% end %>
-
-  <%= form_with url: login_path, method: :post, class: "login-form" do |form| %>
-    <div class="field">
-      <%= form.label :username, "Nom d'utilisateur" %>
-      <%= form.text_field :username, autofocus: true %>
+<div class="login-page">
+  <div class="header-banner">
+    <div class="city-logo">
+      <i class="fas fa-landmark"></i>
     </div>
-
-    <div class="field">
-      <%= form.label :password, "Mot de passe" %>
-      <%= form.password_field :password %>
+    <div class="title-container">
+      <h1>Nancy - Conseils d'École</h1>
+      <p class="subtitle">Direction de l'Éducation</p>
     </div>
+  </div>
 
-    <div class="actions">
-      <%= form.submit "Se connecter", class: "login-button" %>
+  <div class="login-container">
+    <div class="login-tabs">
+      <button class="tab-button active" data-tab="credentials">Connexion standard</button>
+      <button class="tab-button" data-tab="schools">Connexion par école</button>
     </div>
-  <% end %>
+    
+    <div class="tab-content" id="credentials-tab" style="display: block;">
+      <div class="login-form-container">
+        <h2>Identification</h2>
+        
+        <% if flash[:alert] %>
+          <div class="alert"><%= flash[:alert] %></div>
+        <% end %>
+        
+        <% if flash[:notice] %>
+          <div class="notice"><%= flash[:notice] %></div>
+        <% end %>
+    
+        <%= form_with url: login_path, method: :post, class: "login-form" do |form| %>
+          <div class="field">
+            <div class="field-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <%= form.label :username, "Nom d'utilisateur" %>
+            <%= form.text_field :username, value: params[:username], placeholder: "Votre identifiant...", autofocus: true %>
+          </div>
+    
+          <div class="field">
+            <div class="field-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <%= form.label :password, "Mot de passe" %>
+            <%= form.password_field :password, placeholder: "Votre mot de passe..." %>
+          </div>
+    
+          <div class="actions">
+            <%= form.submit "Se connecter", class: "login-button" %>
+          </div>
+        <% end %>
+        
+        <div class="login-help">
+          <p>Pour tout problème de connexion, veuillez contacter la Direction de l'Éducation au 03.83.85.XX.XX</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="schools-tab" style="display: none;">
+      <div class="schools-header">
+        <h2>Sélectionnez votre établissement</h2>
+        
+        <div class="search-filter-container">
+          <div class="search-container">
+            <input type="text" id="school-search-input" placeholder="Rechercher une école..." class="search-input">
+            <i class="fas fa-search search-icon"></i>
+          </div>
+          
+          <div class="filter-container">
+            <button class="filter-btn active" data-filter="all">Toutes</button>
+            <button class="filter-btn" data-filter="nursery">Maternelles</button>
+            <button class="filter-btn" data-filter="elementary">Élémentaires</button>
+            <button class="filter-btn" data-filter="primary">Primaires</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="schools-grid">
+        <!-- École Maternelles -->
+        <div class="school-card" data-type="nursery" data-id="1" data-name="École Maternelle Alfred Mézières">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Alfred Mézières</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 1 rue Granville, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="2" data-name="École Maternelle Boudonville">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Boudonville</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 18 rue de la Colline, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="3" data-name="École Maternelle Braconnot">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Braconnot</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 2 rue Braconnot, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="4" data-name="École Maternelle Buffon">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Buffon</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 7 place Godefroy de Bouillon, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="5" data-name="École Maternelle Charles Duchêne">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Charles Duchêne</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 25 rue Charles Duchêne, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="6" data-name="École Maternelle Christian Ercksen">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Christian Ercksen</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 21 rue des Jardiniers, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="7" data-name="École Maternelle Clemenceau">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Clemenceau</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 3 rue Georges Clemenceau, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="8" data-name="École Maternelle Didion">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Didion</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 15 rue Didion, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="9" data-name="École Maternelle Émile Gallé">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Émile Gallé</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 13 rue de la Craffe, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="10" data-name="École Maternelle Gaston Colnat">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Gaston Colnat</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 2 rue Gaston Colnat, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="11" data-name="École Maternelle Jean Jaurès">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Jean Jaurès</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 3 rue de l'Abbé Lemire, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="12" data-name="École Maternelle Jules Ferry">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Jules Ferry</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 19 rue de la Bergamote, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="13" data-name="École Maternelle Marcel Leroy">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Marcel Leroy</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 2 bis rue Marcel Leroy, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="14" data-name="École Maternelle Michelet">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Michelet</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 16 rue Jules Ferry, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="15" data-name="École Maternelle Saint-Georges">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Saint-Georges</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 4 rue Saint-Georges, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="16" data-name="École Maternelle Saint-Pierre">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Saint-Pierre</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 32 rue Saint-Nicolas, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="17" data-name="École Maternelle Stanislas">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Stanislas</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 22 rue Gustave Simon, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="18" data-name="École Maternelle Trois Maisons">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Trois Maisons</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 9 rue des Trois Maisons, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="19" data-name="École Maternelle Victor Hugo">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Victor Hugo</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 35 bis boulevard d'Austrasie, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="20" data-name="École Maternelle Charlemagne">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Charlemagne</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 23 rue de Dieuze, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="21" data-name="École Maternelle Buthegnémont">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Buthegnémont</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 6 rue de Buthegnémont, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="nursery" data-id="22" data-name="École Maternelle Ory">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Ory</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 59 rue Pierre Semard, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <!-- Écoles Élémentaires -->
+        <div class="school-card" data-type="elementary" data-id="23" data-name="École Élémentaire Alfred Mézières">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Alfred Mézières</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 3 rue Granville, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="24" data-name="École Élémentaire Boudonville">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Boudonville</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 20 rue de la Colline, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="25" data-name="École Élémentaire Braconnot">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Braconnot</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 5 rue Braconnot, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="26" data-name="École Élémentaire Buffon">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Buffon</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 9 place Godefroy de Bouillon, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="27" data-name="École Élémentaire Charlemagne">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Charlemagne</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 25 rue de Dieuze, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="28" data-name="École Élémentaire Clemenceau">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Clemenceau</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 5 rue Georges Clemenceau, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="29" data-name="École Élémentaire Didion">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Didion</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 17 rue Didion, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="30" data-name="École Élémentaire Didion-Raugraff">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Didion-Raugraff</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 19 rue Didion, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="31" data-name="École Élémentaire Jean Jaurès">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Jean Jaurès</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 5 rue de l'Abbé Lemire, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="32" data-name="École Élémentaire Jules Ferry">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Jules Ferry</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 21 rue de la Bergamote, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="33" data-name="École Élémentaire Marcel Leroy">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Marcel Leroy</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 4 rue Marcel Leroy, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="34" data-name="École Élémentaire Montet">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Montet</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 2 rue Louis Majorelle, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="35" data-name="École Élémentaire Saint-Georges">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Saint-Georges</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 6 rue Saint-Georges, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="36" data-name="École Élémentaire Saint-Pierre">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Saint-Pierre</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 34 rue Saint-Nicolas, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="37" data-name="École Élémentaire Stanislas">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Stanislas</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 24 rue Gustave Simon, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="38" data-name="École Élémentaire Trois Maisons">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Trois Maisons</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 11 rue des Trois Maisons, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="39" data-name="École Élémentaire de la Fontaine">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire de la Fontaine</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 11 allée de la Champagne, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="40" data-name="École Élémentaire Buthegnémont">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Buthegnémont</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 8 rue de Buthegnémont, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="41" data-name="École Élémentaire Ory">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Ory</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 61 rue Pierre Semard, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="42" data-name="École Élémentaire Brabois">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire Brabois</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 2 allée de Bourgogne, 54500 Vandœuvre-lès-Nancy</p>
+          </div>
+        </div>
+
+        <div class="school-card" data-type="elementary" data-id="43" data-name="École Élémentaire du Placieux">
+          <div class="school-icon">
+            <i class="fas fa-book-reader"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Élémentaire du Placieux</h3>
+            <span class="school-type elementary">Élémentaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 14 rue du Placieux, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <!-- École Primaire -->
+        <div class="school-card" data-type="primary" data-id="44" data-name="École Primaire Beauregard">
+          <div class="school-icon">
+            <i class="fas fa-school"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Primaire Beauregard</h3>
+            <span class="school-type primary">Primaire</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 14 rue Aristide Briand, 54000 Nancy</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
+<!-- Modal de connexion pour l'école sélectionnée -->
+<div id="school-login-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close-button">&times;</span>
+    <h2>Connexion à <span id="school-name"></span></h2>
+    
+    <%= form_with url: login_path, method: :post, class: "login-form" do |form| %>
+      <%= form.hidden_field :school_id, id: "modal-school-id" %>
+      
+      <div class="login-user-type">
+        <button type="button" class="user-type-btn active" data-role="school">Directeur</button>
+        <button type="button" class="user-type-btn" data-role="official">Élu</button>
+      </div>
+      
+      <div class="field">
+        <div class="field-icon">
+          <i class="fas fa-user"></i>
+        </div>
+        <%= form.label :username, "Nom d'utilisateur" %>
+        <%= form.text_field :username, id: "modal-username", placeholder: "Votre identifiant..." %>
+      </div>
+
+      <div class="field">
+        <div class="field-icon">
+          <i class="fas fa-lock"></i>
+        </div>
+        <%= form.label :password, "Mot de passe" %>
+        <%= form.password_field :password, placeholder: "Votre mot de passe..." %>
+      </div>
+
+      <div class="actions">
+        <%= form.submit "Se connecter", class: "login-button" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des onglets
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Désactiver tous les onglets
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.style.display = 'none');
+        
+        // Activer l'onglet sélectionné
+        button.classList.add('active');
+        const tabId = button.getAttribute('data-tab');
+        document.getElementById(tabId + '-tab').style.display = 'block';
+      });
+    });
+    
+    // Filtrage des écoles
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const searchInput = document.getElementById('school-search-input');
+    const schoolCards = document.querySelectorAll('.school-card');
+    
+    function updateSchoolsDisplay() {
+      const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+      const searchTerm = searchInput.value.toLowerCase();
+      
+      schoolCards.forEach(card => {
+        const schoolName = card.getAttribute('data-name').toLowerCase();
+        const schoolType = card.getAttribute('data-type');
+        
+        const matchesFilter = activeFilter === 'all' || schoolType === activeFilter;
+        const matchesSearch = schoolName.includes(searchTerm);
+        
+        if (matchesFilter && matchesSearch) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+    
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        updateSchoolsDisplay();
+      });
+    });
+    
+    searchInput.addEventListener('input', updateSchoolsDisplay);
+    
+    // Modal de connexion par école
+    const modal = document.getElementById('school-login-modal');
+    const closeButton = document.querySelector('.close-button');
+    const schoolNameElement = document.getElementById('school-name');
+    const schoolIdInput = document.getElementById('modal-school-id');
+    const usernameInput = document.getElementById('modal-username');
+    
+    schoolCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const schoolId = card.getAttribute('data-id');
+        const schoolName = card.getAttribute('data-name');
+        
+        modal.style.display = 'block';
+        schoolNameElement.textContent = schoolName;
+        schoolIdInput.value = schoolId;
+        
+        // Par défaut, définir le nom d'utilisateur au format école
+        usernameInput.value = 'ecole_' + schoolId;
+      });
+    });
+    
+    closeButton.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+    
+    window.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+    
+    // Changer le format du nom d'utilisateur en fonction du rôle sélectionné
+    const userTypeButtons = document.querySelectorAll('.user-type-btn');
+    
+    userTypeButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        userTypeButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        
+        const role = button.getAttribute('data-role');
+        const schoolId = schoolIdInput.value;
+        
+        if (role === 'school') {
+          usernameInput.value = 'ecole_' + schoolId;
+        } else if (role === 'official') {
+          usernameInput.value = 'elu_' + schoolId;
+        }
+      });
+    });
+  });
+</script>
+
 <style>
-  .login-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  /* Styles généraux */
+  * {
+    box-sizing: border-box;
   }
   
-  .login-form .field {
-    margin-bottom: 15px;
+  body {
+    font-family: 'Public Sans', Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Bannière d'en-tête */
+  .header-banner {
+    background: linear-gradient(to right, #003366, #1a5ca5);
+    color: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  
+  .city-logo {
+    font-size: 2.5rem;
+    margin-right: 1.5rem;
+  }
+  
+  .title-container h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+  
+  .subtitle {
+    margin: 0;
+    font-size: 1rem;
+    opacity: 0.8;
+  }
+  
+  /* Conteneur de connexion */
+  .login-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .login-container {
+    max-width: 1200px;
+    width: 90%;
+    margin: 2rem auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Onglets de connexion */
+  .login-tabs {
+    display: flex;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .tab-button {
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  
+  .tab-button:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background-color: #1a5ca5;
+    transition: width 0.2s;
+  }
+  
+  .tab-button.active {
+    color: #1a5ca5;
+    font-weight: 600;
+  }
+  
+  .tab-button.active:after {
+    width: 100%;
+  }
+  
+  .tab-content {
+    padding: 2rem;
+    flex-grow: 1;
+  }
+  
+  /* Formulaire de connexion standard */
+  .login-form-container {
+    max-width: 450px;
+    margin: 0 auto;
+  }
+  
+  .login-form-container h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #1a5ca5;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .field {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  
+  .field-icon {
+    position: absolute;
+    left: 1rem;
+    top: 2.5rem;
+    color: #1a5ca5;
   }
   
   .login-form label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
   }
   
   .login-form input[type="text"],
   .login-form input[type="password"] {
     width: 100%;
-    padding: 10px;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
     border: 1px solid #ddd;
     border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+  
+  .login-form input[type="text"]:focus,
+  .login-form input[type="password"]:focus {
+    border-color: #1a5ca5;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(26,92,165,0.2);
   }
   
   .login-button {
-    background-color: #c00;
+    width: 100%;
+    background-color: #1a5ca5;
     color: white;
     border: none;
-    padding: 10px 15px;
+    padding: 0.8rem 1rem;
     border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    font-weight: bold;
+    transition: background-color 0.2s;
   }
   
   .login-button:hover {
-    background-color: #a00;
+    background-color: #003366;
   }
   
   .alert {
-    padding: 10px;
+    padding: 0.8rem 1rem;
     background-color: #f8d7da;
     color: #721c24;
     border-radius: 4px;
-    margin-bottom: 15px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .notice {
+    padding: 0.8rem 1rem;
+    background-color: #d4edda;
+    color: #155724;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .login-help {
+    margin-top: 2rem;
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  /* Section des écoles */
+  .schools-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .schools-header h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #1a5ca5;
+  }
+  
+  .search-filter-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .search-container {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.7rem 1rem 0.7rem 2.5rem;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 0.95rem;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #1a5ca5;
+  }
+  
+  .filter-container {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .filter-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 20px;
+    background-color: #eee;
+    color: #555;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .filter-btn.active {
+    background-color: #1a5ca5;
+    color: white;
+  }
+  
+  /* Grille des écoles */
+  .schools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+  
+  .school-card {
+    display: flex;
+    background-color: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .school-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: #1a5ca5;
+  }
+  
+  .school-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: #1a5ca5;
+    background-color: rgba(26,92,165,0.1);
+    border-radius: 50%;
+    margin-right: 1rem;
+  }
+  
+  .school-details {
+    flex: 1;
+  }
+  
+  .school-name {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+    color: #1a5ca5;
+  }
+  
+  .school-type {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  
+  .school-type.elementary {
+    background-color: rgba(46, 125, 50, 0.1);
+    color: #2e7d32;
+  }
+  
+  .school-type.nursery {
+    background-color: rgba(123, 31, 162, 0.1);
+    color: #7b1fa2;
+  }
+  
+  .school-type.primary {
+    background-color: rgba(25, 118, 210, 0.1);
+    color: #1976d2;
+  }
+  
+  .school-address {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .school-address i {
+    margin-right: 0.5rem;
+    color: #888;
+  }
+  
+  /* Modal de connexion */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-content {
+    position: relative;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    width: 90%;
+    max-width: 500px;
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  
+  .close-button:hover {
+    color: #333;
+  }
+  
+  .modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #1a5ca5;
+    text-align: center;
+  }
+  
+  .login-user-type {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .user-type-btn {
+    flex: 1;
+    padding: 0.8rem;
+    border: none;
+    background-color: #f5f5f5;
+    color: #555;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .user-type-btn.active {
+    background-color: #1a5ca5;
+    color: white;
+  }
+  
+  /* Media Queries */
+  @media (max-width: 768px) {
+    .header-banner {
+      flex-direction: column;
+      text-align: center;
+      padding: 1rem;
+    }
+    
+    .city-logo {
+      margin-right: 0;
+      margin-bottom: 0.5rem;
+    }
+    
+    .login-container {
+      width: 95%;
+      margin: 1rem auto;
+    }
+    
+    .tab-button {
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
+    }
+    
+    .tab-content {
+      padding: 1.5rem 1rem;
+    }
+    
+    .search-filter-container {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .schools-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

@@ -164,3 +164,4 @@ Report.create!(
   follow_up: 'Une demande d\'intervention a été faite auprès des services techniques de la ville.',
   submitted: true
 )
+
