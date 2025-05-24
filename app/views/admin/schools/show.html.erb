@@ -1,0 +1,622 @@
+<div class="school-detail-page">
+  <div class="page-header">
+    <div class="header-content">
+      <div class="school-icon">
+        <% if @school.type == 'elementary' %>
+          <i class="fas fa-book-reader"></i>
+        <% elsif @school.type == 'nursery' %>
+          <i class="fas fa-baby"></i>
+        <% else %>
+          <i class="fas fa-school"></i>
+        <% end %>
+      </div>
+      <div class="school-info">
+        <h1 class="school-name"><%= @school.name %></h1>
+        <% if @school.type.present? %>
+          <span class="school-type <%= @school.type&.downcase %>">
+            <%= { 'elementary' => 'École Élémentaire', 'nursery' => 'École Maternelle', 'primary' => 'École Primaire' }[@school.type] || 'École' %>
+          </span>
+        <% end %>
+        <p class="school-address">
+          <i class="fas fa-map-marker-alt"></i> <%= @school.address %>
+        </p>
+      </div>
+    </div>
+    
+    <div class="action-buttons">
+      <%= link_to "Retour aux écoles", schools_path, class: "btn btn-secondary" %>
+      <% if current_user.admin? || (current_user.school? && current_user.schools.include?(@school)) %>
+        <%= link_to "Modifier", edit_school_path(@school), class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="school-stats">
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-chalkboard"></i></div>
+      <div class="stat-value"><%= @school.class_count || 0 %></div>
+      <div class="stat-label">Classes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-users"></i></div>
+      <div class="stat-value"><%= @school.student_count || 0 %></div>
+      <div class="stat-label">Élèves</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+      <div class="stat-value"><%= @school.teacher_count || 0 %></div>
+      <div class="stat-label">Enseignants</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+      <div class="stat-value"><%= @upcoming_councils.count %></div>
+      <div class="stat-label">Conseils à venir</div>
+    </div>
+  </div>
+
+  <div class="content-sections">
+    <div class="section">
+      <div class="section-header">
+        <h2><i class="fas fa-calendar-alt"></i> Prochains conseils d'école</h2>
+        <% if current_user.admin? || (current_user.school? && current_user.schools.include?(@school)) %>
+          <%= link_to "Nouveau conseil", new_council_path(school_id: @school.id), class: "btn btn-primary btn-sm" %>
+        <% end %>
+      </div>
+      
+      <% if @upcoming_councils.any? %>
+        <div class="councils-grid">
+          <% @upcoming_councils.each do |council| %>
+            <div class="council-card">
+              <div class="council-date">
+                <div class="date-day"><%= council.date.strftime('%d') %></div>
+                <div class="date-month"><%= council.date.strftime('%b') %></div>
+              </div>
+              <div class="council-details">
+                <h3 class="council-title"><%= council.title %></h3>
+                <p class="council-time">
+                  <i class="far fa-clock"></i> 
+                  <%= council.start_time %>
+                  <% if council.end_time.present? %>
+                    - <%= council.end_time %>
+                  <% end %>
+                </p>
+                <% if council.location.present? %>
+                  <p class="council-location">
+                    <i class="fas fa-map-marker-alt"></i> <%= council.location %>
+                  </p>
+                <% end %>
+              </div>
+              <div class="council-actions">
+                <%= link_to "Détails", council_path(council), class: "btn btn-outline" %>
+                
+                <% if current_user.official? %>
+                  <% attendance = council.attendances.find_by(user_id: current_user.id) %>
+                  <% if attendance %>
+                    <% case attendance.status %>
+                    <% when "pending" %>
+                      <div class="attendance-actions">
+                        <%= link_to "Confirmer", attendance_path(attendance, status: "confirmed"), method: :patch, class: "btn btn-success btn-sm" %>
+                        <%= link_to "Décliner", attendance_path(attendance, status: "declined"), method: :patch, class: "btn btn-danger btn-sm" %>
+                      </div>
+                    <% when "confirmed" %>
+                      <span class="attendance-badge confirmed">Confirmé</span>
+                    <% when "declined" %>
+                      <span class="attendance-badge declined">Décliné</span>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="empty-state">
+          <i class="fas fa-calendar-times"></i>
+          <p>Aucun conseil d'école planifié pour le moment.</p>
+          <% if current_user.admin? || (current_user.school? && current_user.schools.include?(@school)) %>
+            <%= link_to "Planifier un conseil", new_council_path(school_id: @school.id), class: "btn btn-primary" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <h2><i class="fas fa-info-circle"></i> Informations</h2>
+        <% if current_user.admin? || (current_user.school? && current_user.schools.include?(@school)) %>
+          <%= link_to "Nouvelle information", new_information_path(school_id: @school.id), class: "btn btn-primary btn-sm" %>
+        <% end %>
+      </div>
+      
+      <% if @information.any? %>
+        <div class="information-list">
+          <% @information.limit(5).each do |info| %>
+            <div class="information-item">
+              <div class="info-header">
+                <h4 class="info-title"><%= info.title %></h4>
+                <span class="info-date"><%= info.created_at.strftime('%d/%m/%Y') %></span>
+              </div>
+              <p class="info-content"><%= truncate(info.content, length: 150) %></p>
+              <%= link_to "Lire la suite", information_path(info), class: "info-link" %>
+            </div>
+          <% end %>
+        </div>
+        
+        <% if @information.count > 5 %>
+          <div class="view-more">
+            <%= link_to "Voir toutes les informations (#{@information.count})", information_index_path(school_id: @school.id), class: "btn btn-outline" %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="empty-state">
+          <i class="fas fa-info-circle"></i>
+          <p>Aucune information disponible pour cette école.</p>
+          <% if current_user.admin? || (current_user.school? && current_user.schools.include?(@school)) %>
+            <%= link_to "Ajouter une information", new_information_path(school_id: @school.id), class: "btn btn-primary" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <% if @past_councils.any? %>
+      <div class="section">
+        <div class="section-header">
+          <h2><i class="fas fa-history"></i> Conseils passés</h2>
+        </div>
+        
+        <div class="past-councils-list">
+          <% @past_councils.limit(5).each do |council| %>
+            <div class="past-council-item">
+              <div class="council-info">
+                <h4><%= council.title %></h4>
+                <p><%= council.date.strftime('%d/%m/%Y') %></p>
+              </div>
+              <div class="council-actions">
+                <%= link_to "Voir", council_path(council), class: "btn btn-outline btn-sm" %>
+                <% if current_user.official? %>
+                  <% report = council.reports.find_by(user_id: current_user.id) %>
+                  <% if report %>
+                    <%= link_to "Mon rapport", report_path(report), class: "btn btn-primary btn-sm" %>
+                  <% else %>
+                    <%= link_to "Créer rapport", new_report_path(council_id: council.id), class: "btn btn-secondary btn-sm" %>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<style>
+  .school-detail-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .page-header {
+    background: linear-gradient(to right, #003366, #1a5ca5);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header-content {
+    display: flex;
+    align-items: center;
+  }
+  
+  .school-icon {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin-right: 1.5rem;
+  }
+  
+  .school-name {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+  
+  .school-type {
+    font-size: 0.9rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    background-color: rgba(255,255,255,0.2);
+    margin-bottom: 0.8rem;
+    display: inline-block;
+  }
+  
+  .school-address {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+  }
+  
+  .school-address i {
+    margin-right: 0.5rem;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary {
+    background-color: #1a5ca5;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #003366;
+  }
+  
+  .btn-secondary {
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  
+  .btn-secondary:hover {
+    background-color: rgba(255,255,255,0.3);
+  }
+  
+  .btn-outline {
+    background-color: transparent;
+    color: #1a5ca5;
+    border: 1px solid #1a5ca5;
+  }
+  
+  .btn-outline:hover {
+    background-color: #1a5ca5;
+    color: white;
+  }
+  
+  .btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .btn-success {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .school-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .stat-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .stat-icon {
+    font-size: 2rem;
+    color: #1a5ca5;
+    margin-bottom: 1rem;
+  }
+  
+  .stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a5ca5;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .content-sections {
+    display: grid;
+    gap: 3rem;
+  }
+  
+  .section {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  
+  .section-header {
+    background-color: #f8f9fa;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .section-header h2 {
+    margin: 0;
+    color: #1a5ca5;
+    font-size: 1.3rem;
+  }
+  
+  .section-header h2 i {
+    margin-right: 0.5rem;
+  }
+  
+  .councils-grid {
+    padding: 2rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+  
+  .council-card {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    transition: box-shadow 0.2s;
+  }
+  
+  .council-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .council-date {
+    text-align: center;
+    margin-right: 1.5rem;
+    min-width: 60px;
+  }
+  
+  .date-day {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a5ca5;
+    line-height: 1;
+  }
+  
+  .date-month {
+    font-size: 0.9rem;
+    color: #666;
+    text-transform: uppercase;
+  }
+  
+  .council-details {
+    flex: 1;
+  }
+  
+  .council-title {
+    margin: 0 0 0.5rem 0;
+    color: #1a5ca5;
+    font-size: 1.1rem;
+  }
+  
+  .council-time, .council-location {
+    margin: 0.3rem 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .council-time i, .council-location i {
+    margin-right: 0.5rem;
+    color: #888;
+  }
+  
+  .council-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .attendance-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .attendance-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .attendance-badge.confirmed {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+  }
+  
+  .attendance-badge.declined {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+  }
+  
+  .information-list {
+    padding: 2rem;
+  }
+  
+  .information-item {
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .information-item:last-child {
+    border-bottom: none;
+  }
+  
+  .info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+  }
+  
+  .info-title {
+    margin: 0;
+    color: #1a5ca5;
+    font-size: 1.1rem;
+  }
+  
+  .info-date {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .info-content {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  
+  .info-link {
+    color: #1a5ca5;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .info-link:hover {
+    text-decoration: underline;
+  }
+  
+  .past-councils-list {
+    padding: 2rem;
+  }
+  
+  .past-council-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .past-council-item:last-child {
+    border-bottom: none;
+  }
+  
+  .council-info h4 {
+    margin: 0 0 0.3rem 0;
+    color: #1a5ca5;
+  }
+  
+  .council-info p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .view-more {
+    padding: 1.5rem 2rem;
+    text-align: center;
+    border-top: 1px solid #eee;
+  }
+  
+  .empty-state {
+    padding: 3rem 2rem;
+    text-align: center;
+    color: #666;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    color: #ddd;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-state p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  @media (max-width: 768px) {
+    .school-detail-page {
+      padding: 1rem;
+    }
+    
+    .page-header {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .header-content {
+      flex-direction: column;
+      margin-bottom: 1.5rem;
+    }
+    
+    .school-icon {
+      margin-right: 0;
+      margin-bottom: 1rem;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .school-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .council-card {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .council-date {
+      margin-right: 0;
+      margin-bottom: 1rem;
+    }
+    
+    .council-actions {
+      margin-top: 1rem;
+      justify-content: center;
+    }
+    
+    .past-council-item {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .council-actions {
+      margin-top: 1rem;
+    }
+  }
+</style>
