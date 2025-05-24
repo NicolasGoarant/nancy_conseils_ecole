@@ -22,13 +22,13 @@
         </p>
       </div>
     </div>
-    
+
     <div class="admin-actions">
       <%= link_to "Retour", admin_schools_path, class: "btn btn-secondary" %>
       <%= link_to "Modifier", edit_admin_school_path(@school), class: "btn btn-primary" %>
-      <%= link_to "Supprimer", admin_school_path(@school), method: :delete, 
-                  confirm: "Êtes-vous sûr de vouloir supprimer cette école ?", 
-                  class: "btn btn-danger" %>
+      <%= link_to "Supprimer", admin_school_path(@school), method: :delete,
+                    data: { confirm: "Êtes-vous sûr de vouloir supprimer cette école ?" },
+                    class: "btn btn-danger" %>
     </div>
   </div>
 
@@ -50,7 +50,7 @@
     </div>
     <div class="stat-card">
       <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-      <div class="stat-value"><%= @upcoming_councils.count %></div>
+      <div class="stat-value"><%= @upcoming_councils&.count || 0 %></div>
       <div class="stat-label">Conseils à venir</div>
     </div>
   </div>
@@ -61,7 +61,7 @@
         <h2><i class="fas fa-calendar-alt"></i> Gestion des conseils d'école</h2>
         <%= link_to "Nouveau conseil", new_admin_council_path(school_id: @school.id), class: "btn btn-primary btn-sm" %>
       </div>
-      
+
       <% if @upcoming_councils.any? %>
         <div class="councils-table">
           <table class="data-table">
@@ -108,7 +108,7 @@
         <h2><i class="fas fa-info-circle"></i> Informations publiées</h2>
         <%= link_to "Nouvelle information", new_admin_information_path(school_id: @school.id), class: "btn btn-primary btn-sm" %>
       </div>
-      
+
       <% if @information.any? %>
         <div class="information-table">
           <table class="data-table">
@@ -155,7 +155,6 @@
         <div class="section-header">
           <h2><i class="fas fa-history"></i> Historique des conseils</h2>
         </div>
-        
         <div class="past-councils-table">
           <table class="data-table">
             <thead>
@@ -190,7 +189,7 @@
       <div class="section-header">
         <h2><i class="fas fa-users"></i> Utilisateurs associés</h2>
       </div>
-      
+
       <div class="users-table">
         <table class="data-table">
           <thead>
@@ -202,7 +201,7 @@
             </tr>
           </thead>
           <tbody>
-            <% @school.school_official_association&.user.present? %>
+            <% if @school.school_official_association&.user.present? %>
               <tr>
                 <td><%= @school.school_official_association.user.full_name %></td>
                 <td><span class="role-badge <%= @school.school_official_association.user.role %>"><%= @school.school_official_association.user.role %></span></td>
@@ -218,292 +217,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  .admin-school-detail {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-  
-  .page-header {
-    background: linear-gradient(135deg, #dc3545, #c82333);
-    color: white;
-    padding: 2rem;
-    border-radius: 10px;
-    margin-bottom: 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .header-content {
-    display: flex;
-    align-items: center;
-  }
-  
-  .school-icon {
-    width: 80px;
-    height: 80px;
-    background-color: rgba(255,255,255,0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    margin-right: 1.5rem;
-  }
-  
-  .school-name {
-    margin: 0 0 0.5rem 0;
-    font-size: 2rem;
-    font-weight: 700;
-  }
-  
-  .school-type {
-    font-size: 0.9rem;
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    background-color: rgba(255,255,255,0.2);
-    margin-bottom: 0.8rem;
-    display: inline-block;
-  }
-  
-  .school-address {
-    margin: 0;
-    opacity: 0.9;
-    font-size: 1.1rem;
-  }
-  
-  .admin-actions {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  .btn {
-    padding: 0.6rem 1.2rem;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 0.9rem;
-  }
-  
-  .btn-primary {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .btn-secondary {
-    background-color: rgba(255,255,255,0.2);
-    color: white;
-    border: 1px solid rgba(255,255,255,0.3);
-  }
-  
-  .btn-danger {
-    background-color: rgba(220,53,69,0.8);
-    color: white;
-  }
-  
-  .btn-outline {
-    background-color: transparent;
-    color: #007bff;
-    border: 1px solid #007bff;
-  }
-  
-  .btn-sm {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
-  }
-  
-  .admin-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 3rem;
-  }
-  
-  .stat-card {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    text-align: center;
-    border-left: 4px solid #dc3545;
-  }
-  
-  .stat-icon {
-    font-size: 2rem;
-    color: #dc3545;
-    margin-bottom: 1rem;
-  }
-  
-  .stat-value {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #dc3545;
-    margin-bottom: 0.5rem;
-  }
-  
-  .stat-label {
-    color: #666;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  
-  .admin-content {
-    display: grid;
-    gap: 2rem;
-  }
-  
-  .section {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    overflow: hidden;
-  }
-  
-  .section-header {
-    background-color: #f8f9fa;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .section-header h2 {
-    margin: 0;
-    color: #dc3545;
-    font-size: 1.3rem;
-  }
-  
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .data-table th,
-  .data-table td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .data-table th {
-    background-color: #f8f9fa;
-    font-weight: 600;
-    color: #555;
-  }
-  
-  .data-table tr:hover {
-    background-color: #f8f9fa;
-  }
-  
-  .actions {
-    white-space: nowrap;
-  }
-  
-  .actions .btn {
-    margin-right: 0.5rem;
-  }
-  
-  .participant-count {
-    background-color: #e9ecef;
-    padding: 0.3rem 0.6rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    color: #495057;
-  }
-  
-  .tag {
-    background-color: #007bff;
-    color: white;
-    padding: 0.2rem 0.5rem;
-    border-radius: 10px;
-    font-size: 0.75rem;
-    margin-right: 0.3rem;
-  }
-  
-  .role-badge {
-    padding: 0.3rem 0.6rem;
-    border-radius: 15px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  
-  .role-badge.admin {
-    background-color: #dc3545;
-    color: white;
-  }
-  
-  .role-badge.official {
-    background-color: #28a745;
-    color: white;
-  }
-  
-  .role-badge.school {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .empty-state {
-    padding: 3rem 2rem;
-    text-align: center;
-    color: #666;
-  }
-  
-  .empty-state i {
-    font-size: 3rem;
-    color: #ddd;
-    margin-bottom: 1rem;
-  }
-  
-  .empty-state p {
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  @media (max-width: 768px) {
-    .admin-school-detail {
-      padding: 1rem;
-    }
-    
-    .page-header {
-      flex-direction: column;
-      text-align: center;
-    }
-    
-    .header-content {
-      flex-direction: column;
-      margin-bottom: 1.5rem;
-    }
-    
-    .school-icon {
-      margin-right: 0;
-      margin-bottom: 1rem;
-    }
-    
-    .admin-actions {
-      flex-direction: column;
-      width: 100%;
-    }
-    
-    .admin-stats {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .data-table {
-      font-size: 0.8rem;
-    }
-    
-    .data-table th,
-    .data-table td {
-      padding: 0.5rem;
-    }
-  }
-</style>

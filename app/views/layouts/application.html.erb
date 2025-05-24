@@ -146,13 +146,7 @@
     <% end %>
     
     <main class="<%= 'no-header' unless logged_in? %>">
-      <% if flash[:notice] %>
-        <div class="notice"><%= flash[:notice] %></div>
-      <% end %>
-      
-      <% if flash[:alert] %>
-        <div class="alert"><%= flash[:alert] %></div>
-      <% end %>
+
       
       <%= yield %>
       
@@ -163,8 +157,5 @@
       <% end %>
     </main>
     
-    <footer>
-      <p>&copy; <%= Date.today.year %> Ville de Nancy - Direction de l'Éducation</p>
-    </footer>
   </body>
 </html>
