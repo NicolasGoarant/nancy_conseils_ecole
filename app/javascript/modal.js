@@ -43,5 +43,33 @@ document.addEventListener('turbo:load', function() {
       });
     });
   });
+
+  document.addEventListener('turbo:load', function() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+  
+    if (tabButtons.length && tabContents.length) {
+      tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          // Activer le bouton actif
+          tabButtons.forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+  
+          const targetTab = button.getAttribute('data-tab');
+  
+          // Masquer tous les contenus
+          tabContents.forEach(content => {
+            content.style.display = 'none';
+          });
+  
+          // Afficher le contenu correspondant
+          const activeContent = document.getElementById(`${targetTab}-tab`);
+          if (activeContent) {
+            activeContent.style.display = 'block';
+          }
+        });
+      });
+    }
+  });
   
   
