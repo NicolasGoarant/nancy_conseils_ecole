@@ -8,12 +8,12 @@
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
-    
+
     <!-- Polices Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Font Awesome pour les icônes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -33,9 +33,6 @@
       }
       main {
         padding: 2rem;
-      }
-      main.no-header {
-        padding: 0;
       }
       footer {
         background-color: #333;
@@ -76,19 +73,6 @@
         background-color: #f8d7da;
         color: #721c24;
       }
-      .school-card {
-        background-color: #f9f9f9;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      }
-      .field {
-        margin-bottom: 1rem;
-      }
-      .actions {
-        margin-top: 1rem;
-      }
       .admin-access {
         position: fixed;
         bottom: 70px;
@@ -116,46 +100,46 @@
   </head>
 
   <body>
-    <% if logged_in? %>
-      <header>
-        <div class="logo">
-          <%= link_to root_path do %>
-            <h1>Nancy - Conseils d'École</h1>
-          <% end %>
-        </div>
-        
-        <nav>
-          <ul>
-            <li><%= link_to "Tableau de bord", root_path %></li>
-            <% if current_user.official? %>
-              <li><%= link_to "Mes écoles", schools_path %></li>
-              <li><%= link_to "Mes conseils", councils_path %></li>
-              <li><%= link_to "Mes rapports", reports_path %></li>
-            <% end %>
-            <% if current_user.school? %>
-              <li><%= link_to "Informations", information_index_path %></li>
-              <li><%= link_to "Conseils", councils_path %></li>
-            <% end %>
-            <% if current_user.admin? %>
-              <li><%= link_to "Administration", admin_root_path %></li>
-            <% end %>
-            <li><%= link_to "Déconnexion", logout_path, data: { turbo_method: :delete } %></li>
-          </ul>
-        </nav>
-      </header>
-    <% end %>
-    
-    <main class="<%= 'no-header' unless logged_in? %>">
+    <!-- Header affiché partout -->
+    <header>
+      <div class="logo">
+        <%= link_to root_path do %>
+          <h1>Nancy - Conseils d'École</h1>
+        <% end %>
+      </div>
 
-      
+      <nav>
+        <ul>
+          <li><%= link_to "Tableau de bord", root_path %></li>
+          <% if current_user&.official? %>
+            <li><%= link_to "Mes écoles", schools_path %></li>
+            <li><%= link_to "Mes conseils", councils_path %></li>
+            <li><%= link_to "Mes rapports", reports_path %></li>
+          <% end %>
+          <% if current_user&.school? %>
+            <li><%= link_to "Informations", information_index_path %></li>
+            <li><%= link_to "Conseils", councils_path %></li>
+          <% end %>
+          <% if current_user&.admin? %>
+            <li><%= link_to "Administration", admin_root_path %></li>
+          <% end %>
+          <% if logged_in? %>
+            <li><%= link_to "Déconnexion", logout_path, data: { turbo_method: :delete } %></li>
+          <% end %>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
       <%= yield %>
-      
+
       <% unless logged_in? %>
         <%= link_to login_path(admin: true), class: "admin-access" do %>
           <i class="fas fa-shield-alt"></i> Accès administrateur
         <% end %>
       <% end %>
     </main>
-    
   </body>
 </html>
+
+

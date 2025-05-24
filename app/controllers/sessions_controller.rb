@@ -1,4 +1,5 @@
 class SessionsController < ApplicationController
+  layout "application", except: [:new]
   def new
     # Récupérer toutes les écoles pour l'affichage en vignettes
     @schools = School.all.order(:name)
