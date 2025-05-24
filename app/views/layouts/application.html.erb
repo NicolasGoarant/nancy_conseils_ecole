@@ -1,145 +1,23 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Nancy - Conseils d'École</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+<head>
+  <title>Nancy - Conseils d'École</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
 
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
+  <%= stylesheet_link_tag 'application', media: 'all' %>
+<%= javascript_importmap_tags %>
 
-    <!-- Polices Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="header-banner">
+    <h1>Nancy - Conseils d'École</h1>
+  </header>
 
-    <!-- Font Awesome pour les icônes -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-      body {
-        font-family: 'Public Sans', Arial, sans-serif;
-        line-height: 1.6;
-        margin: 0;
-        padding: 0;
-      }
-      header {
-        background-color: #1a5ca5;
-        color: white;
-        padding: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      main {
-        padding: 2rem;
-      }
-      footer {
-        background-color: #333;
-        color: white;
-        text-align: center;
-        padding: 1rem;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-      }
-      nav ul {
-        display: flex;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-      nav ul li {
-        margin-left: 1rem;
-      }
-      nav ul li a {
-        color: white;
-        text-decoration: none;
-      }
-      .logo a {
-        color: white;
-        text-decoration: none;
-      }
-      .notice, .alert {
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 4px;
-      }
-      .notice {
-        background-color: #d4edda;
-        color: #155724;
-      }
-      .alert {
-        background-color: #f8d7da;
-        color: #721c24;
-      }
-      .admin-access {
-        position: fixed;
-        bottom: 70px;
-        right: 20px;
-        z-index: 100;
-        background-color: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 0.5rem 1rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        text-decoration: none;
-        color: #555;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.2s;
-      }
-      .admin-access:hover {
-        background-color: #e9ecef;
-        color: #1a5ca5;
-        border-color: #1a5ca5;
-      }
-    </style>
-  </head>
+  <%= yield %>
 
-  <body>
-    <!-- Header affiché partout -->
-    <header>
-      <div class="logo">
-        <%= link_to root_path do %>
-          <h1>Nancy - Conseils d'École</h1>
-        <% end %>
-      </div>
-
-      <nav>
-        <ul>
-          <li><%= link_to "Tableau de bord", root_path %></li>
-          <% if current_user&.official? %>
-            <li><%= link_to "Mes écoles", schools_path %></li>
-            <li><%= link_to "Mes conseils", councils_path %></li>
-            <li><%= link_to "Mes rapports", reports_path %></li>
-          <% end %>
-          <% if current_user&.school? %>
-            <li><%= link_to "Informations", information_index_path %></li>
-            <li><%= link_to "Conseils", councils_path %></li>
-          <% end %>
-          <% if current_user&.admin? %>
-            <li><%= link_to "Administration", admin_root_path %></li>
-          <% end %>
-          <% if logged_in? %>
-            <li><%= link_to "Déconnexion", logout_path, data: { turbo_method: :delete } %></li>
-          <% end %>
-        </ul>
-      </nav>
-    </header>
-
-    <main>
-      <%= yield %>
-
-      <% unless logged_in? %>
-        <%= link_to login_path(admin: true), class: "admin-access" do %>
-          <i class="fas fa-shield-alt"></i> Accès administrateur
-        <% end %>
-      <% end %>
-    </main>
-  </body>
+  <!-- Ici, pas besoin de dupliquer ton script JS : il est déjà dans `app/javascript/application.js` -->
+</body>
 </html>
 
 

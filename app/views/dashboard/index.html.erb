@@ -1,7 +1,7 @@
 <!-- Bannière d'en-tête (ajoute ceci à ton layout global si ce n'est pas déjà le cas) -->
 <div class="header-banner">
   <div class="title-container">
-    <h1>Nancy - Conseils d'École</h1>
+    <h1>Nancy - CConseils d'École</h1>
   </div>
   <div class="subtitle-container">
     <p class="subtitle">Gestion des écoles et des conseils</p>
@@ -137,7 +137,10 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('turbo:load', function() {
+  // ton code JS
+});
+
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
