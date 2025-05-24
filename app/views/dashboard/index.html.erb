@@ -1,229 +1,196 @@
-<div class="header-banner">
-  <h1>Tableau de bord - Conseils d'École</h1>
-  <p class="subtitle">Ville de Nancy - Direction de l'Éducation</p>
-</div>
-
-<% if current_user %>
-  <div class="welcome-card">
-    <div class="welcome-icon">
-      <% if current_user.admin? %>
-        <i class="fas fa-user-shield"></i>
-      <% elsif current_user.official? %>
-        <i class="fas fa-user-tie"></i>
-      <% elsif current_user.school? %>
-        <i class="fas fa-school"></i>
-      <% end %>
+<div class="login-page">
+  <div class="header-banner">
+    <div class="city-logo">
+      <i class="fas fa-landmark"></i>
     </div>
-    <div class="welcome-text">
-      <h2>Bienvenue, <%= current_user.full_name %></h2>
-      <p>
-        <% if current_user.admin? %>
-          Vous avez accès à la gestion de toutes les écoles et des conseils d'école.
-        <% elsif current_user.official? %>
-          Vous pouvez consulter les informations des écoles qui vous sont assignées.
-        <% elsif current_user.school? %>
-          Vous pouvez gérer les informations de votre établissement et planifier les conseils d'école.
-        <% end %>
-      </p>
+    <div class="title-container">
+      <h1>Nancy - Conseils d'École</h1>
+      <p class="subtitle">Direction de l'Éducation</p>
     </div>
   </div>
 
-  <% if current_user.admin? %>
-    <div class="stats-overview">
-      <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-school"></i></div>
-        <div class="stat-value"><%= @schools_count %></div>
-        <div class="stat-label">Écoles</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-users"></i></div>
-        <div class="stat-value"><%= @users_count %></div>
-        <div class="stat-label">Utilisateurs</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-        <div class="stat-value"><%= @councils_count %></div>
-        <div class="stat-label">Conseils</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
-        <div class="stat-value"><%= @reports_count %></div>
-        <div class="stat-label">Rapports</div>
-      </div>
-    </div>
-  <% end %>
-
-  <div class="dashboard-section">
-    <div class="section-header">
-      <h2>Les écoles de Nancy</h2>
-      <div class="filters-container">
-        <div class="search-bar">
-          <input type="text" id="school-search" placeholder="Rechercher une école..." class="search-input">
-          <button class="search-button"><i class="fas fa-search"></i></button>
-        </div>
-        <div class="filter-buttons">
-          <button class="filter-btn active" data-filter="all">Toutes</button>
-          <button class="filter-btn" data-filter="elementary">Élémentaire</button>
-          <button class="filter-btn" data-filter="nursery">Maternelle</button>
-          <button class="filter-btn" data-filter="primary">Primaire</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="schools-grid" id="schools-container">
-      <% 
-        # Détermine les écoles à afficher : toutes pour les admins, seulement les associations pour les autres
-        schools_to_display = if current_user.admin?
-                              @all_schools
-                             elsif current_user.official?
-                              current_user.schools.where(associations: { active: true }).distinct
-                             elsif current_user.school?
-                              current_user.schools.distinct
-                             else
-                              []
-                             end
-      %>
-      
-      <% schools_to_display.each do |school| %>
-        <div class="school-card" data-type="<%= school.type&.downcase %>">
-          <div class="school-header">
-            <h3 class="school-name"><%= school.name %></h3>
-            <span class="school-type <%= school.type&.downcase %>">
-              <%= { 'elementary' => 'Élémentaire', 'nursery' => 'Maternelle', 'primary' => 'Primaire' }[school.type] || 'École' %>
-            </span>
-          </div>
-          <div class="school-icon">
-            <% if school.type == 'elementary' %>
-              <i class="fas fa-book-reader"></i>
-            <% elsif school.type == 'nursery' %>
-              <i class="fas fa-baby"></i>
-            <% else %>
-              <i class="fas fa-school"></i>
-            <% end %>
-          </div>
-          <div class="school-info">
-            <p class="school-address"><i class="fas fa-map-marker-alt"></i> <%= school.address %></p>
-            <div class="school-stats">
-              <div class="stat-item">
-                <span class="stat-value"><%= school.class_count || 0 %></span>
-                <span class="stat-label">Classes</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-value"><%= school.student_count || 0 %></span>
-                <span class="stat-label">Élèves</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-value"><%= school.teacher_count || 0 %></span>
-                <span class="stat-label">Enseignants</span>
-              </div>
-            </div>
-          </div>
-          <div class="school-actions">
-            <%= link_to "Voir détails", school_path(school), class: "action-button" %>
-            
-            <% if current_user.admin? || (current_user.school? && current_user.schools.include?(school)) %>
-              <%= link_to "Gérer", "#", class: "action-button secondary" %>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
-    </div>
-  </div>
-
-  <div class="dashboard-section">
-    <div class="section-header">
-      <h2>Prochains conseils</h2>
-      <%= link_to "Voir tous", councils_path, class: "view-all-link" %>
+  <div class="login-container">
+    <div class="login-tabs">
+      <button class="tab-button" data-tab="credentials">Connexion standard</button>
+      <button class="tab-button active" data-tab="schools">Connexion par école</button>
     </div>
     
-    <div class="councils-container">
-      <% if @upcoming_councils.any? %>
-        <div class="council-cards">
-          <% @upcoming_councils.each do |council| %>
-            <div class="council-card">
-              <div class="council-date">
-                <div class="date-day"><%= council.date.strftime('%d') %></div>
-                <div class="date-month"><%= council.date.strftime('%b') %></div>
-              </div>
-              <div class="council-details">
-                <h3 class="council-title"><%= council.title %></h3>
-                <p class="council-school"><%= council.school.name %></p>
-                <p class="council-time">
-                  <i class="far fa-clock"></i> <%= council.start_time %> 
-                  <% if council.end_time.present? %>
-                    - <%= council.end_time %>
-                  <% end %>
-                </p>
-                <p class="council-location">
-                  <i class="fas fa-map-marker-alt"></i> <%= council.location || "À déterminer" %>
-                </p>
-              </div>
-              <div class="council-actions">
-                <%= link_to "Détails", council_path(council), class: "council-button" %>
-                
-                <% if current_user.official? %>
-                  <% attendance = council.attendances.find_by(user_id: current_user.id) %>
-                  <% if attendance %>
-                    <% if attendance.status == "pending" %>
-                      <div class="attendance-actions">
-                        <%= link_to "Confirmer", attendance_path(attendance, status: "confirmed"), method: :patch, class: "confirm-btn" %>
-                        <%= link_to "Décliner", attendance_path(attendance, status: "declined"), method: :patch, class: "decline-btn" %>
-                      </div>
-                    <% else %>
-                      <span class="attendance-status <%= attendance.status %>">
-                        <%= { "confirmed" => "Confirmé", "declined" => "Décliné" }[attendance.status] %>
-                      </span>
-                    <% end %>
-                  <% end %>
-                <% end %>
-              </div>
+    <div class="tab-content" id="credentials-tab" style="display: none;">
+      <div class="login-form-container">
+        <h2>Identification</h2>
+        
+        <% if flash[:alert] %>
+          <div class="alert"><%= flash[:alert] %></div>
+        <% end %>
+        
+        <% if flash[:notice] %>
+          <div class="notice"><%= flash[:notice] %></div>
+        <% end %>
+    
+        <%= form_with url: login_path, method: :post, class: "login-form" do |form| %>
+          <div class="field">
+            <div class="field-icon">
+              <i class="fas fa-user"></i>
             </div>
-          <% end %>
+            <%= form.label :username, "Nom d'utilisateur" %>
+            <%= form.text_field :username, value: @use_admin ? "admin" : params[:username], placeholder: "Votre identifiant...", autofocus: true %>
+          </div>
+    
+          <div class="field">
+            <div class="field-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <%= form.label :password, "Mot de passe" %>
+            <%= form.password_field :password, value: @use_admin ? "password" : nil, placeholder: "Votre mot de passe..." %>
+          </div>
+    
+          <div class="actions">
+            <%= form.submit "Se connecter", class: "login-button" %>
+          </div>
+          
+          <div class="admin-login-hint">
+            <a href="<%= login_path(admin: true) %>" class="admin-link">
+              <i class="fas fa-shield-alt"></i> Connexion administrateur
+            </a>
+          </div>
+        <% end %>
+        
+        <div class="login-help">
+          <p>Pour tout problème de connexion, veuillez contacter la Direction de l'Éducation au 03.83.85.XX.XX</p>
         </div>
-      <% else %>
-        <p class="no-data-message">Aucun conseil à venir pour le moment.</p>
-      <% end %>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="schools-tab" style="display: block;">
+      <div class="schools-header">
+        <h2>Sélectionnez votre établissement</h2>
+        
+        <div class="search-filter-container">
+          <div class="search-container">
+            <input type="text" id="school-search-input" placeholder="Rechercher une école..." class="search-input">
+            <i class="fas fa-search search-icon"></i>
+          </div>
+          
+          <div class="filter-container">
+            <button class="filter-btn active" data-filter="all">Toutes</button>
+            <button class="filter-btn" data-filter="nursery">Maternelles</button>
+            <button class="filter-btn" data-filter="elementary">Élémentaires</button>
+            <button class="filter-btn" data-filter="primary">Primaires</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="schools-grid">
+        <!-- École Maternelles -->
+        <div class="school-card" data-type="nursery" data-id="1" data-name="École Maternelle Alfred Mézières">
+          <div class="school-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <div class="school-details">
+            <h3 class="school-name">École Maternelle Alfred Mézières</h3>
+            <span class="school-type nursery">Maternelle</span>
+            <p class="school-address"><i class="fas fa-map-marker-alt"></i> 1 rue Granville, 54000 Nancy</p>
+          </div>
+        </div>
+
+        <!-- ... autres écoles ... -->
+      </div>
+      
+      <div class="admin-login-hint" style="text-align: center; margin-top: 2rem;">
+        <a href="<%= login_path(admin: true) %>" class="admin-link">
+          <i class="fas fa-shield-alt"></i> Connexion administrateur
+        </a>
+      </div>
     </div>
   </div>
-<% else %>
-  <div class="login-required">
-    <div class="login-message">
-      <i class="fas fa-lock"></i>
-      <h2>Accès restreint</h2>
-      <p>Veuillez vous connecter pour accéder au tableau de bord des conseils d'école.</p>
-      <%= link_to "Se connecter", login_path, class: "login-button" %>
-    </div>
+</div>
+
+<!-- Modal de connexion pour l'école sélectionnée -->
+<div id="school-login-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close-button">&times;</span>
+    <h2>Connexion à <span id="school-name"></span></h2>
+    
+    <%= form_with url: login_path, method: :post, class: "login-form" do |form| %>
+      <%= form.hidden_field :school_id, id: "modal-school-id" %>
+      
+      <div class="login-user-type">
+        <button type="button" class="user-type-btn active" data-role="school">Directeur</button>
+        <button type="button" class="user-type-btn" data-role="official">Élu</button>
+      </div>
+      
+      <div class="field">
+        <div class="field-icon">
+          <i class="fas fa-user"></i>
+        </div>
+        <%= form.label :username, "Nom d'utilisateur" %>
+        <%= form.text_field :username, id: "modal-username", placeholder: "Votre identifiant..." %>
+      </div>
+
+      <div class="field">
+        <div class="field-icon">
+          <i class="fas fa-lock"></i>
+        </div>
+        <%= form.label :password, "Mot de passe" %>
+        <%= form.password_field :password, placeholder: "Votre mot de passe..." %>
+      </div>
+
+      <div class="actions">
+        <%= form.submit "Se connecter", class: "login-button" %>
+      </div>
+      
+      <div class="admin-login-hint" style="margin-top: 1rem; text-align: center;">
+        <a href="#" id="admin-modal-login" class="admin-link">
+          <i class="fas fa-shield-alt"></i> Connexion administrateur
+        </a>
+      </div>
+    <% end %>
   </div>
-<% end %>
+</div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des onglets
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Désactiver tous les onglets
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.style.display = 'none');
+        
+        // Activer l'onglet sélectionné
+        button.classList.add('active');
+        const tabId = button.getAttribute('data-tab');
+        document.getElementById(tabId + '-tab').style.display = 'block';
+      });
+    });
+    
     // Filtrage des écoles
     const filterButtons = document.querySelectorAll('.filter-btn');
-    const searchInput = document.getElementById('school-search');
+    const searchInput = document.getElementById('school-search-input');
     const schoolCards = document.querySelectorAll('.school-card');
     
-    // Fonction pour filtrer les écoles
     function updateSchoolsDisplay() {
-      const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+      const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
       const searchTerm = searchInput.value.toLowerCase();
       
       schoolCards.forEach(card => {
-        const schoolName = card.querySelector('.school-name').textContent.toLowerCase();
-        const schoolType = card.dataset.type;
+        const schoolName = card.getAttribute('data-name').toLowerCase();
+        const schoolType = card.getAttribute('data-type');
         
         const matchesFilter = activeFilter === 'all' || schoolType === activeFilter;
         const matchesSearch = schoolName.includes(searchTerm);
         
         if (matchesFilter && matchesSearch) {
-          card.style.display = 'block';
+          card.style.display = 'flex';
         } else {
           card.style.display = 'none';
         }
       });
     }
     
-    // Gestionnaires d'événements
     filterButtons.forEach(button => {
       button.addEventListener('click', () => {
         filterButtons.forEach(btn => btn.classList.remove('active'));
@@ -234,187 +201,335 @@
     
     searchInput.addEventListener('input', updateSchoolsDisplay);
     
-    // Initialisation
-    updateSchoolsDisplay();
+    // Modal de connexion par école
+    const modal = document.getElementById('school-login-modal');
+    const closeButton = document.querySelector('.close-button');
+    const schoolNameElement = document.getElementById('school-name');
+    const schoolIdInput = document.getElementById('modal-school-id');
+    const usernameInput = document.getElementById('modal-username');
+    const passwordInput = modal.querySelector('input[type="password"]');
+    
+    schoolCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const schoolId = card.getAttribute('data-id');
+        const schoolName = card.getAttribute('data-name');
+        
+        modal.style.display = 'block';
+        schoolNameElement.textContent = schoolName;
+        schoolIdInput.value = schoolId;
+        
+        // Par défaut, définir le nom d'utilisateur au format école
+        usernameInput.value = 'ecole_' + schoolId;
+      });
+    });
+    
+    closeButton.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+    
+    window.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+    
+    // Changer le format du nom d'utilisateur en fonction du rôle sélectionné
+    const userTypeButtons = document.querySelectorAll('.user-type-btn');
+    
+    userTypeButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        userTypeButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        
+        const role = button.getAttribute('data-role');
+        const schoolId = schoolIdInput.value;
+        
+        if (role === 'school') {
+          usernameInput.value = 'ecole_' + schoolId;
+        } else if (role === 'official') {
+          usernameInput.value = 'elu_' + schoolId;
+        }
+      });
+    });
+    
+    // Connexion admin depuis le modal
+    const adminModalLogin = document.getElementById('admin-modal-login');
+    adminModalLogin.addEventListener('click', (e) => {
+      e.preventDefault();
+      usernameInput.value = 'admin';
+      passwordInput.value = 'password';
+    });
   });
 </script>
 
 <style>
   /* Styles généraux */
+  * {
+    box-sizing: border-box;
+  }
+  
   body {
     font-family: 'Public Sans', Arial, sans-serif;
     line-height: 1.6;
     color: #333;
     background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
   }
   
-  /* En-tête avec bannière */
+  /* Bannière d'en-tête */
   .header-banner {
     background: linear-gradient(to right, #003366, #1a5ca5);
     color: white;
     padding: 1.5rem 2rem;
-    margin-bottom: 2rem;
-    border-radius: 10px;
+    display: flex;
+    align-items: center;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    text-align: center;
   }
   
-  .header-banner h1 {
+  .city-logo {
+    font-size: 2.5rem;
+    margin-right: 1.5rem;
+  }
+  
+  .title-container h1 {
     margin: 0;
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
   }
   
   .subtitle {
-    margin-top: 0.5rem;
-    font-size: 1.1rem;
+    margin: 0;
+    font-size: 1rem;
     opacity: 0.8;
   }
   
-  /* Carte de bienvenue */
-  .welcome-card {
+  /* Conteneur de connexion */
+  .login-page {
+    min-height: 100vh;
     display: flex;
-    align-items: center;
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    margin-bottom: 2rem;
-    border-left: 5px solid #1a5ca5;
+    flex-direction: column;
   }
   
-  .welcome-icon {
-    font-size: 2rem;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(26,92,165,0.1);
-    border-radius: 50%;
-    color: #1a5ca5;
-    margin-right: 1.5rem;
-  }
-  
-  .welcome-text h2 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.5rem;
-  }
-  
-  .welcome-text p {
-    margin: 0;
-    color: #666;
-  }
-  
-  /* Statistiques */
-  .stats-overview {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-  
-  .stat-card {
+  .login-container {
+    max-width: 1200px;
+    width: 90%;
+    margin: 2rem auto;
     background-color: white;
     border-radius: 10px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    text-align: center;
-    transition: transform 0.2s;
-  }
-  
-  .stat-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .stat-icon {
-    margin-bottom: 1rem;
-    font-size: 2rem;
-    color: #1a5ca5;
-  }
-  
-  .stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1a5ca5;
-    line-height: 1;
-    margin-bottom: 0.5rem;
-  }
-  
-  .stat-label {
-    color: #666;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  
-  /* Section de tableau de bord */
-  .dashboard-section {
-    margin-bottom: 3rem;
-  }
-  
-  .section-header {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    flex-grow: 1;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
+    flex-direction: column;
   }
   
-  .section-header h2 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
+  /* Onglets de connexion */
+  .login-tabs {
+    display: flex;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .tab-button {
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
     position: relative;
-    padding-bottom: 0.5rem;
   }
   
-  .section-header h2::after {
+  .tab-button:after {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 50px;
+    width: 0;
     height: 3px;
     background-color: #1a5ca5;
+    transition: width 0.2s;
   }
   
-  /* Filtres et recherche */
-  .filters-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin: 1rem 0;
+  .tab-button.active {
+    color: #1a5ca5;
+    font-weight: 600;
   }
   
-  .search-bar {
+  .tab-button.active:after {
+    width: 100%;
+  }
+  
+  .tab-content {
+    padding: 2rem;
+    flex-grow: 1;
+  }
+  
+  /* Formulaire de connexion standard */
+  .login-form-container {
+    max-width: 450px;
+    margin: 0 auto;
+  }
+  
+  .login-form-container h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #1a5ca5;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .field {
+    margin-bottom: 1.5rem;
     position: relative;
+  }
+  
+  .field-icon {
+    position: absolute;
+    left: 1rem;
+    top: 2.5rem;
+    color: #1a5ca5;
+  }
+  
+  .login-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .login-form input[type="text"],
+  .login-form input[type="password"] {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+  
+  .login-form input[type="text"]:focus,
+  .login-form input[type="password"]:focus {
+    border-color: #1a5ca5;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(26,92,165,0.2);
+  }
+  
+  .login-button {
+    width: 100%;
+    background-color: #1a5ca5;
+    color: white;
+    border: none;
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .login-button:hover {
+    background-color: #003366;
+  }
+  
+  .alert {
+    padding: 0.8rem 1rem;
+    background-color: #f8d7da;
+    color: #721c24;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .notice {
+    padding: 0.8rem 1rem;
+    background-color: #d4edda;
+    color: #155724;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .login-help {
+    margin-top: 2rem;
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .admin-login-hint {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+  
+  .admin-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #555;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+  
+  .admin-link:hover {
+    background-color: #e9ecef;
+    color: #1a5ca5;
+    border-color: #1a5ca5;
+  }
+  
+  .admin-link i {
+    margin-right: 0.5rem;
+  }
+  
+  /* Section des écoles */
+  .schools-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .schools-header h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #1a5ca5;
+  }
+  
+  .search-filter-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .search-container {
+    position: relative;
+    flex: 1;
     min-width: 250px;
   }
   
   .search-input {
     width: 100%;
-    padding: 0.6rem 2.5rem 0.6rem 1rem;
+    padding: 0.7rem 1rem 0.7rem 2.5rem;
     border: 1px solid #ddd;
     border-radius: 20px;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
   }
   
-  .search-button {
+  .search-icon {
     position: absolute;
-    right: 10px;
+    left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    background: none;
-    border: none;
     color: #1a5ca5;
-    cursor: pointer;
   }
   
-  .filter-buttons {
+  .filter-container {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
   }
   
   .filter-btn {
@@ -423,9 +538,9 @@
     border-radius: 20px;
     background-color: #eee;
     color: #555;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.2s;
-    font-weight: 500;
   }
   
   .filter-btn.active {
@@ -433,54 +548,62 @@
     color: white;
   }
   
-  .view-all-link {
-    color: #1a5ca5;
-    text-decoration: none;
-    font-weight: 500;
-  }
-  
-  .view-all-link:after {
-    content: ' →';
-  }
-  
   /* Grille des écoles */
   .schools-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 1.5rem;
+    margin-top: 1rem;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
   }
   
   .school-card {
+    display: flex;
     background-color: white;
-    border-radius: 10px;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
   }
   
   .school-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: #1a5ca5;
   }
   
-  .school-header {
-    padding: 1rem 1.25rem;
+  .school-icon {
+    width: 60px;
+    height: 60px;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: #1a5ca5;
+    background-color: rgba(26,92,165,0.1);
+    border-radius: 50%;
+    margin-right: 1rem;
+  }
+  
+  .school-details {
+    flex: 1;
   }
   
   .school-name {
-    margin: 0;
-    font-size: 1.2rem;
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
     color: #1a5ca5;
   }
   
   .school-type {
     font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
+    padding: 0.2rem 0.5rem;
     border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 0.5rem;
     font-weight: 500;
     text-transform: uppercase;
   }
@@ -500,22 +623,10 @@
     color: #1976d2;
   }
   
-  .school-icon {
-    text-align: center;
-    padding: 1.5rem 0;
-    font-size: 2.5rem;
-    color: #1a5ca5;
-    opacity: 0.7;
-  }
-  
-  .school-info {
-    padding: 0 1.25rem 1.25rem;
-  }
-  
   .school-address {
-    margin: 0 0 1rem;
-    color: #666;
+    margin: 0;
     font-size: 0.9rem;
+    color: #666;
   }
   
   .school-address i {
@@ -523,282 +634,109 @@
     color: #888;
   }
   
-  .school-stats {
+  /* Modal de connexion */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
     display: flex;
-    justify-content: space-around;
-    text-align: center;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #f0f0f0;
-  }
-  
-  .stat-item {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .stat-item .stat-value {
-    font-size: 1.25rem;
-    margin-bottom: 0.25rem;
-  }
-  
-  .stat-item .stat-label {
-    font-size: 0.75rem;
-  }
-  
-  .school-actions {
-    display: flex;
-    padding: 1rem 1.25rem;
-    border-top: 1px solid #f0f0f0;
-    justify-content: space-between;
-    gap: 0.5rem;
-  }
-  
-  .action-button {
-    flex: 1;
-    text-align: center;
-    padding: 0.6rem 0;
-    background-color: #1a5ca5;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: 500;
-    transition: background-color 0.2s;
-  }
-  
-  .action-button:hover {
-    background-color: #0c4d8e;
-  }
-  
-  .action-button.secondary {
-    background-color: #eee;
-    color: #555;
-  }
-  
-  .action-button.secondary:hover {
-    background-color: #ddd;
-  }
-  
-  /* Conseils à venir */
-  .councils-container {
-    background-color: white;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-  }
-  
-  .council-cards {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .council-card {
-    display: flex;
-    padding: 1.25rem;
-    border-bottom: 1px solid #f0f0f0;
-  }
-  
-  .council-card:last-child {
-    border-bottom: none;
-  }
-  
-  .council-date {
-    min-width: 70px;
-    height: 70px;
-    background-color: #1a5ca5;
-    color: white;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
-    margin-right: 1.25rem;
-  }
-  
-  .date-day {
-    font-size: 1.75rem;
-    font-weight: 700;
-    line-height: 1;
-  }
-  
-  .date-month {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    margin-top: 0.25rem;
-  }
-  
-  .council-details {
-    flex: 1;
-  }
-  
-  .council-title {
-    margin: 0 0 0.5rem;
-    color: #1a5ca5;
-    font-size: 1.1rem;
-  }
-  
-  .council-school {
-    margin: 0 0 0.75rem;
-    font-weight: 500;
-  }
-  
-  .council-time, .council-location {
-    margin: 0 0 0.35rem;
-    color: #666;
-    font-size: 0.9rem;
-  }
-  
-  .council-time i, .council-location i {
-    margin-right: 0.5rem;
-    width: 16px;
-    text-align: center;
-  }
-  
-  .council-actions {
-    min-width: 120px;
-    display: flex;
-    flex-direction: column;
     justify-content: center;
-    align-items: flex-end;
-    gap: 0.5rem;
   }
   
-  .council-button {
-    padding: 0.5rem 1rem;
-    background-color: #1a5ca5;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    text-align: center;
-  }
-  
-  .attendance-actions {
-    display: flex;
-    gap: 0.35rem;
-  }
-  
-  .confirm-btn, .decline-btn {
-    padding: 0.35rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    text-decoration: none;
-    color: white;
-  }
-  
-  .confirm-btn {
-    background-color: #4caf50;
-  }
-  
-  .decline-btn {
-    background-color: #f44336;
-  }
-  
-  .attendance-status {
-    padding: 0.35rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 500;
-  }
-  
-  .attendance-status.confirmed {
-    background-color: rgba(76, 175, 80, 0.1);
-    color: #4caf50;
-  }
-  
-  .attendance-status.declined {
-    background-color: rgba(244, 67, 54, 0.1);
-    color: #f44336;
-  }
-  
-  .no-data-message {
+  .modal-content {
+    position: relative;
+    background-color: white;
     padding: 2rem;
-    text-align: center;
-    color: #666;
-  }
-  
-  /* Page de connexion requise */
-  .login-required {
-    min-height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .login-message {
-    text-align: center;
-    padding: 2.5rem;
-    background-color: white;
     border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    width: 90%;
     max-width: 500px;
   }
   
-  .login-message i {
-    font-size: 3rem;
-    color: #1a5ca5;
-    margin-bottom: 1.5rem;
-  }
-  
-  .login-message h2 {
-    margin: 0 0 1rem;
-  }
-  
-  .login-message p {
-    margin: 0 0 1.5rem;
+  .close-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
     color: #666;
+    cursor: pointer;
+    transition: color 0.2s;
   }
   
-  .login-button {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
+  .close-button:hover {
+    color: #333;
+  }
+  
+  .modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #1a5ca5;
+    text-align: center;
+  }
+  
+  .login-user-type {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .user-type-btn {
+    flex: 1;
+    padding: 0.8rem;
+    border: none;
+    background-color: #f5f5f5;
+    color: #555;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .user-type-btn.active {
     background-color: #1a5ca5;
     color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: 500;
   }
   
-  /* Responsive */
+  /* Media Queries */
   @media (max-width: 768px) {
-    .welcome-card {
+    .header-banner {
       flex-direction: column;
       text-align: center;
+      padding: 1rem;
     }
     
-    .welcome-icon {
+    .city-logo {
       margin-right: 0;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
     
-    .section-header {
+    .login-container {
+      width: 95%;
+      margin: 1rem auto;
+    }
+    
+    .tab-button {
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
+    }
+    
+    .tab-content {
+      padding: 1.5rem 1rem;
+    }
+    
+    .search-filter-container {
       flex-direction: column;
-      align-items: flex-start;
+      align-items: stretch;
     }
     
-    .filters-container {
-      margin-top: 1rem;
-      width: 100%;
-    }
-    
-    .search-bar {
-      width: 100%;
-    }
-    
-    .council-card {
-      flex-direction: column;
-    }
-    
-    .council-date {
-      margin-right: 0;
-      margin-bottom: 1rem;
-      align-self: center;
-    }
-    
-    .council-actions {
-      margin-top: 1rem;
-      align-items: flex-start;
+    .schools-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>

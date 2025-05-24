@@ -1,0 +1,91 @@
+<div id="school-login-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close-button">&times;</span>
+    <h2>Connexion à <span id="school-name"></span></h2>
+    
+    <%= form_with url: login_path, method: :post, class: "login-form" do |form| %>
+      <%= form.hidden_field :school_id, id: "modal-school-id" %>
+      
+      <div class="login-user-type">
+        <button type="button" class="user-type-btn active" data-role="school">Directeur</button>
+        <button type="button" class="user-type-btn" data-role="official">Élu</button>
+      </div>
+      
+      <div class="field">
+        <div class="field-icon">
+          <i class="fas fa-user"></i>
+        </div>
+        <%= form.label :username, "Nom d'utilisateur" %>
+        <%= form.text_field :username, id: "modal-username", placeholder: "Votre identifiant..." %>
+      </div>
+
+      <div class="field">
+        <div class="field-icon">
+          <i class="fas fa-lock"></i>
+        </div>
+        <%= form.label :password, "Mot de passe" %>
+        <%= form.password_field :password, id: "modal-password", placeholder: "Votre mot de passe..." %>
+      </div>
+
+      <div class="actions">
+        <%= form.submit "Se connecter", class: "login-button" %>
+      </div>
+      
+      <div class="admin-login-hint" style="margin-top: 1rem; text-align: center;">
+        <a href="#" id="admin-modal-login" class="admin-link">
+          <i class="fas fa-shield-alt"></i> Connexion administrateur
+        </a>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Références aux éléments du modal
+    const modal = document.getElementById('school-login-modal');
+    const closeButton = document.querySelector('.close-button');
+    const schoolNameElement = document.getElementById('school-name');
+    const schoolIdInput = document.getElementById('modal-school-id');
+    const usernameInput = document.getElementById('modal-username');
+    const passwordInput = document.getElementById('modal-password');
+    const adminLoginButton = document.getElementById('admin-modal-login');
+    
+    // Fermeture du modal
+    closeButton.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+    
+    window.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+    
+    // Changer le format du nom d'utilisateur en fonction du rôle sélectionné
+    const userTypeButtons = document.querySelectorAll('.user-type-btn');
+    
+    userTypeButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        userTypeButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        
+        const role = button.getAttribute('data-role');
+        const schoolId = schoolIdInput.value;
+        
+        if (role === 'school') {
+          usernameInput.value = 'ecole_' + schoolId;
+        } else if (role === 'official') {
+          usernameInput.value = 'elu_' + schoolId;
+        }
+      });
+    });
+    
+    // Accès rapide administrateur
+    adminLoginButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      usernameInput.value = 'admin';
+      passwordInput.value = 'password';
+    });
+  });
+</script>

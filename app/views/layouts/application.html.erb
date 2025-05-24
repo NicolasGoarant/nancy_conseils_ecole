@@ -8,15 +8,23 @@
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    
+    <!-- Polices Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
       body {
-        font-family: Arial, sans-serif;
+        font-family: 'Public Sans', Arial, sans-serif;
         line-height: 1.6;
         margin: 0;
         padding: 0;
       }
       header {
-        background-color: #c00;
+        background-color: #1a5ca5;
         color: white;
         padding: 1rem;
         display: flex;
@@ -25,6 +33,9 @@
       }
       main {
         padding: 2rem;
+      }
+      main.no-header {
+        padding: 0;
       }
       footer {
         background-color: #333;
@@ -78,24 +89,41 @@
       .actions {
         margin-top: 1rem;
       }
+      .admin-access {
+        position: fixed;
+        bottom: 70px;
+        right: 20px;
+        z-index: 100;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        text-decoration: none;
+        color: #555;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+      }
+      .admin-access:hover {
+        background-color: #e9ecef;
+        color: #1a5ca5;
+        border-color: #1a5ca5;
+      }
     </style>
   </head>
 
   <body>
-    <header>
-      <div class="logo">
-        <%= link_to root_path do %>
-          <h1>Nancy - Conseils d'École</h1>
-        <% end %>
-      </div>
-      <!-- Polices Google Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Font Awesome pour les icônes -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-      <% if logged_in? %>
+    <% if logged_in? %>
+      <header>
+        <div class="logo">
+          <%= link_to root_path do %>
+            <h1>Nancy - Conseils d'École</h1>
+          <% end %>
+        </div>
+        
         <nav>
           <ul>
             <li><%= link_to "Tableau de bord", root_path %></li>
@@ -114,10 +142,10 @@
             <li><%= link_to "Déconnexion", logout_path, data: { turbo_method: :delete } %></li>
           </ul>
         </nav>
-      <% end %>
-    </header>
+      </header>
+    <% end %>
     
-    <main>
+    <main class="<%= 'no-header' unless logged_in? %>">
       <% if flash[:notice] %>
         <div class="notice"><%= flash[:notice] %></div>
       <% end %>
@@ -127,6 +155,12 @@
       <% end %>
       
       <%= yield %>
+      
+      <% unless logged_in? %>
+        <%= link_to login_path(admin: true), class: "admin-access" do %>
+          <i class="fas fa-shield-alt"></i> Accès administrateur
+        <% end %>
+      <% end %>
     </main>
     
     <footer>
